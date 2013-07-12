@@ -120,13 +120,13 @@ Sprite* Sprite::createWithSpriteFrame(SpriteFrame *pSpriteFrame)
 Sprite* Sprite::createWithSpriteFrameName(const char *pszSpriteFrameName)
 {
     SpriteFrame *pFrame = SpriteFrameCache::getInstance()->spriteFrameByName(pszSpriteFrameName);
-    
+/*    
 #if COCOS2D_DEBUG > 0
     char msg[256] = {0};
     sprintf(msg, "Invalid spriteFrameName: %s", pszSpriteFrameName);
     CCAssert(pFrame != NULL, msg);
 #endif
-    
+*/    
     return createWithSpriteFrame(pFrame);
 }
 
