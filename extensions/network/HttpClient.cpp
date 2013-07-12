@@ -439,11 +439,10 @@ bool HttpClient::lazyInitThreadSemphore()
         s_responseQueue = new Array();
         s_responseQueue->init();
 
+		s_need_quit = false;
         
         auto t = std::thread(&networkThread);
         t.detach();
-        
-        s_need_quit = false;
     }
     
     return true;
