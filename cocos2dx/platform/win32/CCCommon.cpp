@@ -27,6 +27,28 @@ THE SOFTWARE.
 NS_CC_BEGIN
 
 #define MAX_LEN         (cocos2d::kMaxLogLen + 1)
+	
+void CCLogInt(const char * szText )
+{
+	char buffer[MAX_LEN];
+
+	SYSTEMTIME	time;
+
+	GetLocalTime( &time );
+		_snprintf( buffer, sizeof( buffer ), "%02d:%02d:%02d.%03d \t%s", 
+			time.wHour,
+			time.wMinute,
+			time.wSecond,
+			time.wMilliseconds,
+			szText );
+
+	printf("%s\n", buffer);
+
+	WCHAR wszBuf[MAX_LEN] = {0};
+	MultiByteToWideChar(CP_UTF8, 0, buffer, -1, wszBuf, sizeof(wszBuf));
+	OutputDebugStringW(wszBuf);
+	OutputDebugStringA("\n");
+}
 
 void CCLog(const char * pszFormat, ...)
 {
@@ -37,13 +59,7 @@ void CCLog(const char * pszFormat, ...)
     vsnprintf_s(szBuf, MAX_LEN, MAX_LEN, pszFormat, ap);
     va_end(ap);
 
-    WCHAR wszBuf[MAX_LEN] = {0};
-    MultiByteToWideChar(CP_UTF8, 0, szBuf, -1, wszBuf, sizeof(wszBuf));
-    OutputDebugStringW(wszBuf);
-    OutputDebugStringA("\n");
-
-    WideCharToMultiByte(CP_ACP, 0, wszBuf, sizeof(wszBuf), szBuf, sizeof(szBuf), NULL, FALSE);
-    printf("%s\n", szBuf);
+	CCLogInt( szBuf );
 }
 
 void MessageBox(const char * pszMsg, const char * pszTitle)
