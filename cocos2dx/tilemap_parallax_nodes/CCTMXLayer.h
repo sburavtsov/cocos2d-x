@@ -146,7 +146,8 @@ public:
     CCString *propertyNamed(const char *propertyName);
 
     /** Creates the tiles */
-    void setupTiles();
+    void setupTiles(CCDictionary * gidToTileNameDic = NULL);
+	CCDictionary * m_gidToTileNameDic;
 
     /** CCTMXLayer doesn't support adding a CCSprite manually.
     @warning addchild(z, tag); is not supported on CCTMXLayer. Instead of setTileGID.
@@ -157,6 +158,8 @@ public:
 
     inline const char* getLayerName(){ return m_sLayerName.c_str(); }
     inline void setLayerName(const char *layerName){ m_sLayerName = layerName; }
+	unsigned int getMaxGID() const { return m_uMaxGID; }
+
 private:
     CCPoint positionForIsoAt(const CCPoint& pos);
     CCPoint positionForOrthoAt(const CCPoint& pos);
@@ -167,12 +170,16 @@ private:
     /* optimization methods */
     CCSprite* appendTileForGID(unsigned int gid, const CCPoint& pos);
     CCSprite* insertTileForGID(unsigned int gid, const CCPoint& pos);
-    CCSprite* updateTileForGID(unsigned int gid, const CCPoint& pos);
 
+public:
+    CCSprite* updateTileForGID(unsigned int gid, const CCPoint& pos, CCSprite * sourceSprite = NULL);
+
+private:
     /* The layer recognizes some special properties, like cc_vertez */
     void parseInternalProperties();
     void setupTileSprite(CCSprite* sprite, CCPoint pos, unsigned int gid);
-    CCSprite* reusedTileWithRect(CCRect rect);
+	CCSprite* reusedTileWithRect(CCRect rect, CCSprite * sourceSprite = NULL);
+	CCSprite* reusedTileWithGID(unsigned int gid, CCRect rect);
     int vertexZForPos(const CCPoint& pos);
 
     // index
