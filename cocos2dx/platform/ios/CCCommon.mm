@@ -37,7 +37,7 @@ void CCLog(const char * pszFormat, ...)
     static FILE * logFile = NULL;
     if (NULL == logFile)
     {
-        logFile = fopen((CCFileUtils::sharedFileUtils()->getWritablePath() + "log.txt").c_str(), "wt");
+        logFile = fopen((CCFileUtils::sharedFileUtils()->getWritablePath() + "log.txt").c_str(), "wb");
     }
     
     printf("Cocos2d: ");
