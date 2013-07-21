@@ -23,6 +23,7 @@
  ****************************************************************************/
 
 #include "CCCommon.h"
+#include "CCFileUtils.h"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -33,14 +34,25 @@ NS_CC_BEGIN
 
 void CCLog(const char * pszFormat, ...)
 {
+    static FILE * logFile = NULL;
+    if (NULL == logFile)
+    {
+        logFile = fopen((CCFileUtils::sharedFileUtils()->getWritablePath() + "log.txt").c_str(), "wt");
+    }
+    
     printf("Cocos2d: ");
     char szBuf[kMaxLogLen+1] = {0};
     va_list ap;
     va_start(ap, pszFormat);
     vsnprintf(szBuf, kMaxLogLen, pszFormat, ap);
     va_end(ap);
-    printf("%s", szBuf);
-    printf("\n");
+    printf("%s\n", szBuf);
+    
+    if (NULL != logFile)
+    {
+        fprintf(logFile, "%s\n", szBuf);
+        fflush(logFile);
+    }
 }
 
 // ios no MessageBox, use CCLog instead
