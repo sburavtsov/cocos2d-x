@@ -430,10 +430,10 @@ bool CCHttpClient::lazyInitThreadSemphore()
         pthread_mutex_init(&s_SleepMutex, NULL);
         pthread_cond_init(&s_SleepCondition, NULL);
 
+        need_quit = false;
+
         pthread_create(&s_networkThread, NULL, networkThread, NULL);
         pthread_detach(s_networkThread);
-        
-        need_quit = false;
     }
     
     return true;
