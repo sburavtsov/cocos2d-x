@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ****************************************************************************/
 #include "platform/CCCommon.h"
+#include "platform/CCFileUtils.h"
 #include "CCStdC.h"
 
 NS_CC_BEGIN
@@ -48,6 +49,21 @@ void CCLogInt(const char * szText )
 	MultiByteToWideChar(CP_UTF8, 0, buffer, -1, wszBuf, sizeof(wszBuf));
 	OutputDebugStringW(wszBuf);
 	OutputDebugStringA("\n");
+
+	// -----------------
+
+	static FILE * logFile = NULL;
+
+	if (NULL == logFile)
+	{
+		logFile = fopen((CCFileUtils::sharedFileUtils()->getWritablePath() + "log.txt").c_str(), "wt");
+	}
+
+	if (NULL != logFile)
+	{
+		fprintf(logFile, "%s\n", buffer);
+		fflush(logFile);
+	}
 }
 
 void CCLog(const char * pszFormat, ...)
