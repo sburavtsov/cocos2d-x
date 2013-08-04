@@ -30,11 +30,16 @@
 
 #import <UIKit/UIAlert.h>
 
+#ifdef CONFIGURATION_Beta
+#import "TestFlight.h"
+#endif
+
 NS_CC_BEGIN
 
 void CCLog(const char * pszFormat, ...)
 {
     static FILE * logFile = NULL;
+	
     if (NULL == logFile)
     {
         logFile = fopen((CCFileUtils::sharedFileUtils()->getWritablePath() + "log.txt").c_str(), "wb");
@@ -48,6 +53,10 @@ void CCLog(const char * pszFormat, ...)
     va_end(ap);
     printf("%s\n", szBuf);
     
+#ifdef CONFIGURATION_Beta
+	TFLog([NSString stringWithUTF8String:szBuf]);
+#endif
+
     if (NULL != logFile)
     {
         fprintf(logFile, "%s\n", szBuf);
