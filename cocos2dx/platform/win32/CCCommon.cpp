@@ -80,7 +80,10 @@ void CCLog(const char * pszFormat, ...)
 
 void CCMessageBox(const char * pszMsg, const char * pszTitle)
 {
-    MessageBoxA(NULL, pszMsg, pszTitle, MB_OK);
+	if (IDOK != MessageBoxA(NULL, pszMsg, pszTitle, MB_OKCANCEL | MB_ICONHAND))
+	{
+		__asm { int 3 }
+	}
 }
 
 void CCLuaLog(const char *pszMsg)
