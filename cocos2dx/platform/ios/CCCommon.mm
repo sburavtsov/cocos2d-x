@@ -54,7 +54,7 @@ void CCLog(const char * pszFormat, ...)
     printf("%s\n", szBuf);
     
 #ifdef CONFIGURATION_Beta
-	TFLog([NSString stringWithUTF8String:szBuf]);
+	TFLogPreFormatted([NSString stringWithUTF8String:szBuf]);
 #endif
 
     if (NULL != logFile)
