@@ -24,6 +24,7 @@ THE SOFTWARE.
 
 #include "platform/CCCommon.h"
 #include "jni/Java_org_cocos2dx_lib_Cocos2dxHelper.h"
+#include "jni/JniHelper.h"
 #include <android/log.h>
 #include <stdio.h>
 #include <jni.h>
@@ -41,7 +42,27 @@ void CCLog(const char * pszFormat, ...)
     vsnprintf(buf, MAX_LEN, pszFormat, args);
     va_end(args);
 
-    __android_log_print(ANDROID_LOG_DEBUG, "cocos2d-x debug info",  buf);
+    __android_log_print(ANDROID_LOG_DEBUG, "cocos2d-x debug info",  "%s", buf);
+	
+	// -------------------------------------------------------------------------
+	//TestFlight.log("Logging info here…");
+	
+	cocos2d::JniMethodInfo methodInfo;
+	bool isMethodFound = cocos2d::JniHelper::getStaticMethodInfo(
+		methodInfo,
+		"com/testflightapp/lib/TestFlight",
+		"log",
+		"(Ljava/lang/String;)V"); 
+    
+    if (true == isMethodFound)
+	{
+		jstring stringArg0 = methodInfo.env->NewStringUTF(buf);
+		
+        methodInfo.env->CallStaticVoidMethod(methodInfo.classID, methodInfo.methodID, stringArg0);
+		
+		methodInfo.env->DeleteLocalRef(stringArg0);
+		methodInfo.env->DeleteLocalRef(methodInfo.classID);
+	}
 }
 
 void CCMessageBox(const char * pszMsg, const char * pszTitle)
@@ -51,7 +72,7 @@ void CCMessageBox(const char * pszMsg, const char * pszTitle)
 
 void CCLuaLog(const char * pszFormat)
 {
-    __android_log_print(ANDROID_LOG_DEBUG, "cocos2d-x debug info", pszFormat);
+    __android_log_print(ANDROID_LOG_DEBUG, "cocos2d-x debug info", "%s", pszFormat);
 }
 
 NS_CC_END
