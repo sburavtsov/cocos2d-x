@@ -512,7 +512,8 @@ AssetsManager::Helper::Helper()
 {
     _messageQueue = new list<Message*>();
     pthread_mutex_init(&_messageQueueMutex, NULL);
-    CCDirector::sharedDirector()->getScheduler()->scheduleUpdateForTarget(this, 0, false);
+
+	CCDirector::sharedDirector()->getScheduler()->scheduleSelector(schedule_selector(AssetsManager::Helper::update), this, 0.1f, kCCRepeatForever, 0, false);
 }
 
 AssetsManager::Helper::~Helper()
@@ -531,6 +532,8 @@ void AssetsManager::Helper::sendMessage(Message *msg)
 void AssetsManager::Helper::update(float dt)
 {
     Message *msg = NULL;
+	
+	list<Message *> currentMessagesChunk;
     
     // Returns quickly if no message
     pthread_mutex_lock(&_messageQueueMutex);
@@ -539,47 +542,57 @@ void AssetsManager::Helper::update(float dt)
         pthread_mutex_unlock(&_messageQueueMutex);
         return;
     }
-    
-    // Gets message
-    msg = *(_messageQueue->begin());
-    _messageQueue->pop_front();
+
+    // Get and handle all pushed messages
+	while (_messageQueue->size()) {
+
+		currentMessagesChunk.push_back(*(_messageQueue->begin()));
+		_messageQueue->pop_front();
+	}
     pthread_mutex_unlock(&_messageQueueMutex);
     
-    switch (msg->what) {
-        case ASSETSMANAGER_MESSAGE_UPDATE_SUCCEED:
-            handleUpdateSucceed(msg);
-            
-            break;
-        case ASSETSMANAGER_MESSAGE_RECORD_DOWNLOADED_VERSION:
-            CCUserDefault::sharedUserDefault()->setStringForKey(KEY_OF_DOWNLOADED_VERSION,
-                                                                ((AssetsManager*)msg->obj)->_version.c_str());
-            CCUserDefault::sharedUserDefault()->flush();
-            
-            break;
-        case ASSETSMANAGER_MESSAGE_PROGRESS:
-            if (((ProgressMessage*)msg->obj)->manager->_delegate)
-            {
-                ((ProgressMessage*)msg->obj)->manager->_delegate->onProgress(((ProgressMessage*)msg->obj)->percent);
-            }
-            
-            delete (ProgressMessage*)msg->obj;
-            
-            break;
-        case ASSETSMANAGER_MESSAGE_ERROR:
-            // error call back
-            if (((ErrorMessage*)msg->obj)->manager->_delegate)
-            {
-                ((ErrorMessage*)msg->obj)->manager->_delegate->onError(((ErrorMessage*)msg->obj)->code);
-            }
-            
-            delete ((ErrorMessage*)msg->obj);
-            
-            break;
-        default:
-            break;
-    }
-    
-    delete msg;
+	// handle all gathered messages
+	while (currentMessagesChunk.size()) {
+
+		msg = *currentMessagesChunk.begin();
+		currentMessagesChunk.pop_front();
+
+		switch (msg->what) {
+			case ASSETSMANAGER_MESSAGE_UPDATE_SUCCEED:
+				handleUpdateSucceed(msg);
+				
+				break;
+			case ASSETSMANAGER_MESSAGE_RECORD_DOWNLOADED_VERSION:
+				CCUserDefault::sharedUserDefault()->setStringForKey(KEY_OF_DOWNLOADED_VERSION,
+																	((AssetsManager*)msg->obj)->_version.c_str());
+				CCUserDefault::sharedUserDefault()->flush();
+				
+				break;
+			case ASSETSMANAGER_MESSAGE_PROGRESS:
+				if (((ProgressMessage*)msg->obj)->manager->_delegate)
+				{
+					((ProgressMessage*)msg->obj)->manager->_delegate->onProgress(((ProgressMessage*)msg->obj)->percent);
+				}
+				
+				delete (ProgressMessage*)msg->obj;
+				
+				break;
+			case ASSETSMANAGER_MESSAGE_ERROR:
+				// error call back
+				if (((ErrorMessage*)msg->obj)->manager->_delegate)
+				{
+					((ErrorMessage*)msg->obj)->manager->_delegate->onError(((ErrorMessage*)msg->obj)->code);
+				}
+				
+				delete ((ErrorMessage*)msg->obj);
+				
+				break;
+			default:
+				break;
+		}
+		
+		delete msg;	
+	}
 }
 
 void AssetsManager::Helper::handleUpdateSucceed(Message *msg)
@@ -603,6 +616,8 @@ void AssetsManager::Helper::handleUpdateSucceed(Message *msg)
         CCLOG("can not remove downloaded zip file %s", zipfileName.c_str());
     }
     
+	CCDirector::sharedDirector()->getScheduler()->unscheduleSelector(schedule_selector(AssetsManager::Helper::update), this);
+
     if (manager) manager->_delegate->onSuccess();
 }
 
