@@ -603,7 +603,13 @@ void AssetsManager::Helper::handleUpdateSucceed(Message *msg)
         CCLOG("can not remove downloaded zip file %s", zipfileName.c_str());
     }
     
-    if (manager) manager->_delegate->onSuccess();
+    if (manager)
+	{
+		if (manager->_delegate)
+		{
+			manager->_delegate->onSuccess();
+		}
+	}
 }
 
 NS_CC_EXT_END;
