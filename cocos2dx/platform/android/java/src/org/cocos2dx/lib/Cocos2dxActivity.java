@@ -33,6 +33,8 @@ import android.os.Message;
 import android.view.ViewGroup;
 import android.util.Log;
 import android.widget.FrameLayout;
+import android.content.Intent;
+import android.net.Uri;
 
 public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelperListener {
 	// ===========================================================
@@ -47,6 +49,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	
 	private Cocos2dxGLSurfaceView mGLSurfaceView;
 	private Cocos2dxHandler mHandler;
+	private static Activity me = null;
 	private static Context sContext = null;
 	
 	public static Context getContext() {
@@ -61,6 +64,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		sContext = this;
+		me = this;
     	this.mHandler = new Cocos2dxHandler(this);
 
     	this.init();
@@ -155,6 +159,13 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     public Cocos2dxGLSurfaceView onCreateView() {
     	return new Cocos2dxGLSurfaceView(this);
     }
+		
+		// Opens URL as the new activity
+		public static void openURL(String url) {
+			Intent i = new Intent(Intent.ACTION_VIEW);
+			i.setData(Uri.parse(url));
+			me.startActivity(i);
+		}
 
    private final static boolean isAndroidEmulator() {
       String model = Build.MODEL;
