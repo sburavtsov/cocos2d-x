@@ -45,6 +45,21 @@ void CCLog(const char * pszFormat, ...)
     __android_log_print(ANDROID_LOG_DEBUG, "cocos2d-x debug info",  "%s", buf);
 	
 	// -------------------------------------------------------------------------
+	
+	static FILE * logFile = NULL;
+
+	if (NULL == logFile)
+	{
+		logFile = fopen("/mnt/sdcard/playstorm/buildanempire/log.txt", "wt");
+	}
+
+	if (NULL != logFile)
+	{
+		fprintf(logFile, "%s\n", buf);
+		fflush(logFile);
+	}
+	
+	// -------------------------------------------------------------------------
 	//TestFlight.log("Logging info here…");
 	
 	cocos2d::JniMethodInfo methodInfo;
