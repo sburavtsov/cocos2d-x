@@ -23,6 +23,7 @@ THE SOFTWARE.
 ****************************************************************************/
 #include "platform/CCCommon.h"
 #include "platform/CCFileUtils.h"
+#include "CCDirector.h"
 #include "CCStdC.h"
 
 NS_CC_BEGIN
@@ -36,11 +37,12 @@ void CCLogInt(const char * szText )
 	SYSTEMTIME	time;
 
 	GetLocalTime( &time );
-		_snprintf( buffer, sizeof( buffer ), "%02d:%02d:%02d.%03d \t%s", 
+		_snprintf( buffer, sizeof( buffer ), "%02d:%02d:%02d.%03d-%d\t%s", 
 			time.wHour,
 			time.wMinute,
 			time.wSecond,
 			time.wMilliseconds,
+			CCDirector::sharedDirector()->getTotalFrames(),
 			szText );
 
 	printf("%s\n", buffer);
