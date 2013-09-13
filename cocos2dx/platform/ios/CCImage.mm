@@ -330,9 +330,16 @@ static bool _initWithString(const char * pText, cocos2d::CCImage::ETextAlign eAl
         
         // take care of stroke if needed
         if ( pInfo->hasStroke )
-        {
+        {/*
             CGContextSetTextDrawingMode(context, kCGTextFillStroke);
             CGContextSetRGBStrokeColor(context, pInfo->strokeColorR, pInfo->strokeColorG, pInfo->strokeColorB, 1);
+            CGContextSetLineWidth(context, pInfo->strokeSize);
+           */ 
+            
+            // Draw outlined text.
+            CGContextSetTextDrawingMode(context, kCGTextStroke);
+            CGContextSetRGBStrokeColor(context, pInfo->strokeColorR, pInfo->strokeColorG, pInfo->strokeColorB, 1);
+            // Make the thickness of the outline a function of the font size in use.
             CGContextSetLineWidth(context, pInfo->strokeSize);
         }
         
@@ -391,6 +398,12 @@ static bool _initWithString(const char * pText, cocos2d::CCImage::ETextAlign eAl
         
         // actually draw the text in the context
 		// XXX: ios7 casting
+        [str drawInRect:CGRectMake(textOriginX, textOrigingY, textWidth, textHeight) withFont:font lineBreakMode:NSLineBreakByWordWrapping alignment:(NSTextAlignment)align];
+        
+        // Draw filled text.  This will make sure it's clearly readable, while leaving some outline behind it.
+        CGContextSetTextDrawingMode(context, kCGTextFill);
+        CGContextSetRGBFillColor(context, pInfo->tintColorB, pInfo->tintColorG, pInfo->tintColorG, 255);
+
         [str drawInRect:CGRectMake(textOriginX, textOrigingY, textWidth, textHeight) withFont:font lineBreakMode:NSLineBreakByWordWrapping alignment:(NSTextAlignment)align];
         
         // pop the context
