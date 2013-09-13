@@ -287,8 +287,8 @@ static bool _initWithString(const char * pText, cocos2d::CCImage::ETextAlign eAl
         }
         
         // add the padding (this could be 0 if no shadow and no stroke)
-        dim.width  += 2 * shadowStrokePaddingX;
-        dim.height += 2 * shadowStrokePaddingY;
+        dim.width  += shadowStrokePaddingX;
+        dim.height += shadowStrokePaddingY;
         
         
         unsigned char* data = new unsigned char[(int)(dim.width * dim.height * 4)];
@@ -331,7 +331,7 @@ static bool _initWithString(const char * pText, cocos2d::CCImage::ETextAlign eAl
         // take care of stroke if needed
         if ( pInfo->hasStroke )
         {
-            CGContextSetTextDrawingMode(context, kCGTextFillStroke);
+            CGContextSetTextDrawingMode(context, kCGTextStroke);
             CGContextSetRGBStrokeColor(context, pInfo->strokeColorR, pInfo->strokeColorG, pInfo->strokeColorB, 1);
             CGContextSetLineWidth(context, pInfo->strokeSize);
         }
@@ -366,8 +366,8 @@ static bool _initWithString(const char * pText, cocos2d::CCImage::ETextAlign eAl
         float textOriginX  = 0.0f;
         float textOrigingY = 0.0f;
         
-        float textWidth    = dim.width  - 2 * shadowStrokePaddingX;
-        float textHeight   = dim.height - 2 * shadowStrokePaddingY;
+        float textWidth    = dim.width;
+        float textHeight   = dim.height;
         
         
         if ( pInfo->shadowOffset.width < 0 )
@@ -393,11 +393,14 @@ static bool _initWithString(const char * pText, cocos2d::CCImage::ETextAlign eAl
 		// XXX: ios7 casting
         [str drawInRect:CGRectMake(textOriginX, textOrigingY, textWidth, textHeight) withFont:font lineBreakMode:NSLineBreakByWordWrapping alignment:(NSTextAlignment)align];
         
+        textWidth    = dim.width - shadowStrokePaddingX;
+        textHeight   = dim.height - shadowStrokePaddingY;
+
         // Draw filled text.  This will make sure it's clearly readable, while leaving some outline behind it.
         CGContextSetTextDrawingMode(context, kCGTextFill);
         CGContextSetRGBFillColor(context, pInfo->tintColorR, pInfo->tintColorG, pInfo->tintColorB, 1);
 
-        [str drawInRect:CGRectMake(textOriginX, textOrigingY, textWidth, textHeight) withFont:font lineBreakMode:NSLineBreakByWordWrapping alignment:(NSTextAlignment)align];
+        [str drawInRect:CGRectMake(textOriginX + shadowStrokePaddingX / 2.0f, textOrigingY, textWidth, textHeight) withFont:font lineBreakMode:NSLineBreakByWordWrapping alignment:(NSTextAlignment)align];
 
         // pop the context
         UIGraphicsPopContext();
