@@ -372,7 +372,7 @@ static bool _initWithString(const char * pText, cocos2d::CCImage::ETextAlign eAl
         
         if ( pInfo->shadowOffset.width < 0 )
         {
-            textOriginX = shadowStrokePaddingX;
+            textOriginX = shadowStrokePaddingX / 2;
         }
         else
         {
@@ -385,7 +385,7 @@ static bool _initWithString(const char * pText, cocos2d::CCImage::ETextAlign eAl
         }
         else
         {
-            textOrigingY = startH - shadowStrokePaddingY;
+            textOrigingY = startH - shadowStrokePaddingY / 2;
         }
         
         
