@@ -133,6 +133,10 @@ public:
     /** Whether or not the Director is paused */
     inline bool isPaused(void) { return m_bPaused; }
 
+	/** Schedule call CCApplication::sharedApplication()->applicationWillEnterForeground(); */
+	void RiseForegroundEnterFlag() { m_willEnterForegroundFlag = true; }
+	void RiseBackgroundEnterFlag() { m_willEnterBackgroundFlag = true; }
+
     /** How many frames were called since the director started */
     inline unsigned int getTotalFrames(void) { return m_uTotalFrames; }
     
@@ -376,6 +380,13 @@ protected:
     
     /** Whether or not the Director is paused */
     bool m_bPaused;
+
+	/**
+	Android OS may call applicationWillEnterForeground() NOT from main thread(!!!)
+	So we must rise this flag and call appWillEnterForeground in CCDirector::drawScene()
+	*/
+	volatile bool m_willEnterForegroundFlag;
+	volatile bool m_willEnterBackgroundFlag;
 
     /* How many frames were called since the director started */
     unsigned int m_uTotalFrames;

@@ -64,6 +64,7 @@ THE SOFTWARE.
 #include "platform/CCImage.h"
 #include "CCEGLView.h"
 #include "CCConfiguration.h"
+#include "CCEventType.h" 
 
 
 
@@ -101,6 +102,8 @@ CCDirector* CCDirector::sharedDirector(void)
 }
 
 CCDirector::CCDirector(void)
+	: m_willEnterForegroundFlag(false)
+	, m_willEnterBackgroundFlag(false)
 {
 
 }
@@ -1054,6 +1057,24 @@ void CCDisplayLinkDirector::mainLoop(void)
          // release the objects
          CCPoolManager::sharedPoolManager()->pop();        
      }
+
+	if (true == m_willEnterBackgroundFlag)
+	{
+		CCNotificationCenter::sharedNotificationCenter()->postNotification(EVENT_COME_TO_BACKGROUND, NULL);
+		CCApplication::sharedApplication()->applicationDidEnterBackground();
+
+		// It's not good to change multithread variable without mutex, but ok for this time
+		m_willEnterBackgroundFlag = false;
+	}
+
+	if (true == m_willEnterForegroundFlag)
+	{
+		CCNotificationCenter::sharedNotificationCenter()->postNotification(EVENT_COME_TO_FOREGROUND, NULL);
+		CCApplication::sharedApplication()->applicationWillEnterForeground();
+
+		// It's not good to change multithread variable without mutex, but ok for this time
+		m_willEnterForegroundFlag = false;
+	}
 }
 
 void CCDisplayLinkDirector::stopAnimation(void)
