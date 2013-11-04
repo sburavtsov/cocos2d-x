@@ -15,14 +15,12 @@ extern "C" {
     }
 
     JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeOnPause() {
-        CCApplication::sharedApplication()->applicationDidEnterBackground();
-
-        CCNotificationCenter::sharedNotificationCenter()->postNotification(EVENT_COME_TO_BACKGROUND, NULL);
+		CCDirector::sharedDirector()->RiseBackgroundEnterFlag();
     }
 
     JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeOnResume() {
         if (CCDirector::sharedDirector()->getOpenGLView()) {
-            CCApplication::sharedApplication()->applicationWillEnterForeground();
+			CCDirector::sharedDirector()->RiseForegroundEnterFlag();
         }
     }
 
