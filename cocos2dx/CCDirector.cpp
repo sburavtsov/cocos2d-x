@@ -624,6 +624,28 @@ void CCDirector::popScene(void)
     }
 }
 
+CCScene * CCDirector::previousScene() {
+
+	unsigned int c = m_pobScenesStack->count();
+	if (1 >= c) return NULL;
+	return (CCScene*)m_pobScenesStack->objectAtIndex(c - 2);
+}
+
+void CCDirector::popScene(cocos2d::CCScene *transitionScene) {
+	
+	CCAssert(m_pRunningScene != NULL, "running scene should not null");
+	m_pobScenesStack->removeLastObject();
+	unsigned int c = m_pobScenesStack->count();
+	
+	if (c == 0) {
+		end();
+	}
+	else {
+		m_bSendCleanupToScene = true;
+		m_pNextScene = transitionScene;
+	}
+}
+
 void CCDirector::popToRootScene(void)
 {
     popToSceneStackLevel(1);

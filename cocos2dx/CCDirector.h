@@ -230,6 +230,10 @@ public:
      */
     void popScene(void);
 
+	CCScene *previousScene(void);
+	
+	void popScene(CCScene *transitionScene);
+	
     /** Pops out all scenes from the queue until the root scene in the queue.
      * This scene will replace the running one.
      * Internally it will call `popToSceneStackLevel(1)`
