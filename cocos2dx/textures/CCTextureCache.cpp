@@ -364,12 +364,12 @@ void CCTextureCache::addImageAsyncCallBack(float dt)
     }
 }
 
-CCTexture2D * CCTextureCache::addImage(const char * path)
+CCTexture2D * CCTextureCache::addImage(const char * path, CCImage * sourceImage)
 {
     CCAssert(path != NULL, "TextureCache: fileimage MUST not be NULL");
 
     CCTexture2D * texture = NULL;
-    CCImage* pImage = NULL;
+    CCImage* pImage = sourceImage;
     // Split up directory and filename
     // MUTEX:
     // Needed since addImageAsync calls this method from a different thread
@@ -425,11 +425,14 @@ CCTexture2D * CCTextureCache::addImage(const char * path)
                     eImageFormat = CCImage::kFmtWebp;
                 }
                 
-                pImage = new CCImage();
-                CC_BREAK_IF(NULL == pImage);
+				if (NULL == sourceImage)
+				{
+					pImage = new CCImage();
+					CC_BREAK_IF(NULL == pImage);
 
-                bool bRet = pImage->initWithImageFile(fullpath.c_str(), eImageFormat);
-                CC_BREAK_IF(!bRet);
+					bool bRet = pImage->initWithImageFile(fullpath.c_str(), eImageFormat);
+					CC_BREAK_IF(!bRet);
+				}
 
                 texture = new CCTexture2D();
                 

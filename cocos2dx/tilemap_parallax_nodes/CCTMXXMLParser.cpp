@@ -482,8 +482,10 @@ void CCTMXMapInfo::startElement(void *ctx, const char *name, const char **atts)
 
         if (m_sTMXFileName.find_last_of("/") != string::npos)
         {
-            string dir = m_sTMXFileName.substr(0, m_sTMXFileName.find_last_of("/") + 1);
-            tileset->m_sSourceImage = dir + imagename;
+            //string dir = m_sTMXFileName.substr(0, m_sTMXFileName.find_last_of("/") + 1);
+            //tileset->m_sSourceImage = dir + imagename;
+
+			tileset->m_sSourceImage = imagename.substr( imagename.find_last_of("/") + 1 );
         }
         else 
         {
