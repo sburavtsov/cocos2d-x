@@ -54,6 +54,8 @@ public:
     virtual bool writeToFile(CCDictionary *dict, const std::string& fullPath);
     
     virtual CCArray* createCCArrayWithContentsOfFile(const std::string& filename);
+	
+	virtual const std::string getApplicationDirectory();
 };
 
 // end of platform group

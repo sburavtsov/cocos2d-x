@@ -231,6 +231,13 @@ std::string CCFileUtilsIOS::getWritablePath()
     return strRet;
 }
 
+const std::string CCFileUtilsIOS::getApplicationDirectory()
+{
+	std::string strRet = [[[NSBundle mainBundle] bundlePath] UTF8String];
+	strRet.append("/");
+    return strRet;
+}
+
 bool CCFileUtilsIOS::isFileExist(const std::string& strFilePath)
 {
     if (0 == strFilePath.length())

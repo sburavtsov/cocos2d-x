@@ -473,6 +473,7 @@ CCDictionary* CCFileUtils::createCCDictionaryWithContentsOfFile(const std::strin
 CCDictionary* CCFileUtils::createCCDictionaryWithData(const char * data, unsigned int size) {return NULL;}
 bool CCFileUtils::writeToFile(cocos2d::CCDictionary *dict, const std::string &fullPath) {return NULL;}
 CCArray* CCFileUtils::createCCArrayWithContentsOfFile(const std::string& filename) {return NULL;}
+const std::string getApplicationDirectory() { return ""; }
 
 #endif /* (CC_TARGET_PLATFORM != CC_PLATFORM_IOS) && (CC_TARGET_PLATFORM != CC_PLATFORM_MAC) */
 
