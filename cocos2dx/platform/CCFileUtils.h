@@ -80,6 +80,10 @@ public:
      *        this method should be invoked to clean the file search cache.
      */
     virtual void purgeCachedEntries();
+
+
+	virtual const string & getApplicationDirectory() const { return ""; }
+
     
     /**
      *  Gets resource file data
