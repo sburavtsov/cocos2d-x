@@ -82,7 +82,7 @@ public:
     virtual void purgeCachedEntries();
 
 
-	virtual const string & getApplicationDirectory() const { return ""; }
+	virtual const std::string getApplicationDirectory() const { return ""; }
 
     
     /**
