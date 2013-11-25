@@ -26,9 +26,16 @@ THE SOFTWARE.
 
 #include <string>
 #include "CCPlatformDefine.h"
+#include "unzip.h"
 
 namespace cocos2d
 {
+	struct ZipEntryInfo
+	{
+		unz_file_pos pos;
+		uLong uncompressed_size;
+	};
+
     /* XXX: pragma pack ??? */
     /** @struct CCZHeader
     */
@@ -163,7 +170,7 @@ namespace cocos2d
     *
     * @since v2.0.5
     */
-    class ZipFile
+    class CC_DLL ZipFile
     {
     public:
         /**
@@ -209,6 +216,11 @@ namespace cocos2d
         * @since v2.0.5
         */
         unsigned char *getFileData(const std::string &fileName, unsigned long *pSize);
+
+		bool getFileEntry(ZipEntryInfo * outEntry, const std::string &fileName);
+		bool getFileData(void * dest, unsigned long fileSize, ZipEntryInfo & entry);
+
+		const std::string & getFileName() const;
 
     private:
         /** Internal data like zip file pointer / file list array and so on */
