@@ -323,6 +323,30 @@ CCDictionary* CCFileUtilsIOS::createCCDictionaryWithContentsOfFile(const std::st
     }
 }
 
+CCDictionary *CCFileUtilsIOS::createCCDictionaryWithData(const char *data, unsigned int size) {
+	
+	NSData *plistData = [[[NSData alloc] initWithBytes:data length:size] autorelease];
+	
+	NSDictionary * pDict = (NSDictionary *)[NSPropertyListSerialization propertyListFromData:plistData
+													 mutabilityOption:NSPropertyListImmutable
+															   format:NULL
+													 errorDescription:nil];
+    if (pDict != nil)
+    {
+        CCDictionary* pRet = new CCDictionary();
+        for (id key in [pDict allKeys]) {
+            id value = [pDict objectForKey:key];
+            addValueToCCDict(key, value, pRet);
+        }
+        
+        return pRet;
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
 bool CCFileUtilsIOS::writeToFile(CCDictionary *dict, const std::string &fullPath)
 {
     //CCLOG("iOS||Mac CCDictionary %d write to file %s", dict->m_uID, fullPath.c_str());
