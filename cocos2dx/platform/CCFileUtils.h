@@ -345,6 +345,7 @@ protected:
      *  @note This method is used internally.
      */
     virtual CCDictionary* createCCDictionaryWithContentsOfFile(const std::string& filename);
+	virtual CCDictionary* createCCDictionaryWithData(const char * data, unsigned int size);
     
     /**
      *  Write a dictionary to a plist file.

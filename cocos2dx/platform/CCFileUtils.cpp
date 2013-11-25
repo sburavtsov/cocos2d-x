@@ -101,6 +101,21 @@ public:
         return m_pRootDict;
     }
 
+	CCDictionary* dictionaryWithData(const char * data, unsigned int size)
+	{
+		m_eResultType = SAX_RESULT_DICT;
+		CCSAXParser parser;
+
+		if (false == parser.init("UTF-8"))
+		{
+			return NULL;
+		}
+		parser.setDelegator(this);
+
+		parser.parse(data, size);
+		return m_pRootDict;
+	}
+
     CCArray* arrayWithContentsOfFile(const char* pFileName)
     {
         m_eResultType = SAX_RESULT_ARRAY;
@@ -318,6 +333,12 @@ CCDictionary* CCFileUtils::createCCDictionaryWithContentsOfFile(const std::strin
     std::string fullPath = fullPathForFilename(filename.c_str());
     CCDictMaker tMaker;
     return tMaker.dictionaryWithContentsOfFile(fullPath.c_str());
+}
+
+CCDictionary* CCFileUtils::createCCDictionaryWithData(const char * data, unsigned int size)
+{
+	CCDictMaker tMaker;
+	return tMaker.dictionaryWithData(data, size);
 }
 
 CCArray* CCFileUtils::createCCArrayWithContentsOfFile(const std::string& filename)
