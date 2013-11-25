@@ -395,9 +395,6 @@ CCHttpClient::CCHttpClient()
 : _timeoutForConnect(30)
 , _timeoutForRead(60)
 {
-    CCDirector::sharedDirector()->getScheduler()->scheduleSelector(
-                    schedule_selector(CCHttpClient::dispatchResponseCallbacks), this, 0, false);
-    CCDirector::sharedDirector()->getScheduler()->pauseTarget(this);
 }
 
 CCHttpClient::~CCHttpClient()
@@ -434,6 +431,10 @@ bool CCHttpClient::lazyInitThreadSemphore()
 
         pthread_create(&s_networkThread, NULL, networkThread, NULL);
         pthread_detach(s_networkThread);
+		
+		CCDirector::sharedDirector()->getScheduler()->scheduleSelector(
+																	   schedule_selector(CCHttpClient::dispatchResponseCallbacks), this, 0, false);
+		CCDirector::sharedDirector()->getScheduler()->pauseTarget(this);
     }
     
     return true;
