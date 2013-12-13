@@ -27,13 +27,14 @@ import org.cocos2dx.lib.Cocos2dxHelper.Cocos2dxHelperListener;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
+import android.view.View;
 import android.view.ViewGroup;
 import android.util.Log;
 import android.widget.FrameLayout;
-import android.content.Intent;
 import android.net.Uri;
 
 public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelperListener {
@@ -47,9 +48,9 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	// Fields
 	// ===========================================================
 	
-	private Cocos2dxGLSurfaceView mGLSurfaceView;
+	protected Cocos2dxGLSurfaceView mGLSurfaceView;
 	private Cocos2dxHandler mHandler;
-	private static Activity me = null;
+	protected static Activity me = null;
 	private static Context sContext = null;
 	
 	public static Context getContext() {
@@ -81,21 +82,56 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	// ===========================================================
 
 	@Override
-	protected void onResume() {
-		super.onResume();
-
+	protected void onResume()
+	{
+	    if (mGLSurfaceView.getVisibility() == View.GONE)
+	    {
+	    	mGLSurfaceView.setVisibility(View.VISIBLE);
+	    }
+	    
 		Cocos2dxHelper.onResume();
-		this.mGLSurfaceView.onResume();
+		mGLSurfaceView.onResume();
+		
+		super.onResume(); 
 	}
 
 	@Override
-	protected void onPause() {
+	protected void onPause()
+	{	
+		// http://gamedev.stackexchange.com/questions/12629/workaround-to-losing-the-opengl-context-when-android-pauses
+		// Basically the trick is to detach your GLSurfaceView from the view hierarchy
+		// from your Activity's onPause(). Since it's not in the view hierarchy
+		// at the point onPause() runs, the context never gets destroyed.
+		mGLSurfaceView.setVisibility(View.GONE); 
+		mGLSurfaceView.onPause();
+		
+		Cocos2dxHelper.onPause();
 		super.onPause();
+	}
+	
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus)
+	{  
+	    if (hasFocus && (mGLSurfaceView.getVisibility() == View.GONE))
+	    {
+	    	mGLSurfaceView.setVisibility(View.VISIBLE);
+	    }
+
+	    super.onWindowFocusChanged(hasFocus);
+	}
+
+	@Override 
+	protected void onStop()
+	{
+		super.onStop();
+		
+		Log.d(TAG, "onStop");
 
 		Cocos2dxHelper.onPause();
 		this.mGLSurfaceView.onPause();
+	    //android.os.Process.killProcess(android.os.Process.myPid());
 	}
-
+	
 	@Override
 	public void showDialog(final String pTitle, final String pMessage) {
 		Message msg = new Message();
@@ -157,6 +193,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	}
 	
     public Cocos2dxGLSurfaceView onCreateView() {
+    	Log.d(TAG, "new Cocos2dxGLSurfaceView!");
     	return new Cocos2dxGLSurfaceView(this);
     }
 		

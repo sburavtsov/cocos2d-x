@@ -75,6 +75,7 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
 	protected void initView() {
 		this.setEGLContextClientVersion(2);
 		this.setFocusableInTouchMode(true);
+//		this.setPreserveEGLContextOnPause(true); // WW!! 
 
 		Cocos2dxGLSurfaceView.mCocos2dxGLSurfaceView = this;
 		Cocos2dxGLSurfaceView.sCocos2dxTextInputWraper = new Cocos2dxTextInputWraper(this);
@@ -156,8 +157,13 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
 	// ===========================================================
 
 	@Override
-	public void onResume() {
-		super.onResume();
+	public void onResume()
+	{
+		// Calling this method will recreate the OpenGL display and resume the rendering thread.
+		// Must not be called before a renderer has been set.
+		
+		//super.onResume();
+		// Note that you never call the GLSurfaceView's onPause() and onResume()
 
 		this.queueEvent(new Runnable() {
 			@Override
@@ -169,6 +175,7 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
 
 	@Override
 	public void onPause() {
+		
 		this.queueEvent(new Runnable() {
 			@Override
 			public void run() {
@@ -176,7 +183,9 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
 			}
 		});
 
+		// Calling this method will pause the rendering thread
 		//super.onPause();
+		// Note that you never call the GLSurfaceView's onPause() and onResume()
 	}
 
 	@Override
