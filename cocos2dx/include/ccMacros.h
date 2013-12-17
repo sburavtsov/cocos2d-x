@@ -34,7 +34,13 @@ THE SOFTWARE.
 #include "platform/CCCommon.h"
 #include "CCStdC.h"
 
-#if COCOS2D_DEBUG > 0
+#ifndef COCOS2D_FORCE_ASSERT
+#define COCOS2D_FORCE_ASSERT 0
+#endif
+
+#if COCOS2D_DEBUG > 0 || COCOS2D_FORCE_ASSERT > 0
+
+	#define CC_USE_ASSERTS
 
 NS_CC_BEGIN;
 
@@ -58,28 +64,32 @@ NS_CC_END;
 	#define ASSERT_MESSAGE_FORMAT	"%s, assert failed at line %d: %s"
 
 	#define CC_ASSERT_MESSAGE(msg, filename, line) \
-	{ \
+	do { \
 		cocos2d::CCAssertions::AssertMessage(msg, filename, line); \
 		CC_SYSTEM_ASSERT(false); \
-	}
+	} while(0)
 
 	#define CC_ASSERT_WITH_MESSAGE(cond, msg, filename, line) \
-	{ \
+	do { \
 		if (false == (cond)) \
 			CC_ASSERT_MESSAGE(msg, filename, line); \
+	} while(0)
+
+	static inline bool __CheckAssertMessage(const char* szMessage)
+	{
+		return (NULL != szMessage && 0 != szMessage[0] && false == cc_assert_script_compatible(szMessage));
 	}
 
 	#define CC_ASSERT_WITH_MESSAGE_EX(cond, msg, filename, line) \
-	{							\
+	do {							\
 		if (false == (cond))	\
 		{ \
-			const char* szMessage = msg; \
-			if (NULL == szMessage || 0 == szMessage[0] || false != cc_assert_script_compatible(szMessage)) \
-				szMessage = #cond; \
-				\
-			CC_ASSERT_MESSAGE(szMessage, filename, line); \
+			if (false == __CheckAssertMessage(msg)) \
+				CC_ASSERT_MESSAGE(#cond, filename, line); \
+			else \
+				CC_ASSERT_MESSAGE(msg, filename, line); \
 		} \
-	}
+	} while(0)
 	
 #ifndef CC_ASSERT
 	#define CC_ASSERT(cond) CC_ASSERT_WITH_MESSAGE(cond, #cond, __FILE__, __LINE__)
@@ -92,6 +102,8 @@ NS_CC_END;
 	#define CCSetAssertListener(ptr) cocos2d::CCAssertions::SetAssertListener(ptr)
 
 #else
+
+	#undef CC_USE_ASSERTS
 
 #ifndef CC_ASSERT
 	#define	CC_ASSERT(cond)	CC_SYSTEM_ASSERT(cond)

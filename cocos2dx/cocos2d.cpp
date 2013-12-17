@@ -33,7 +33,7 @@ const char* cocos2dVersion()
     return "2.1.5";
 }
 
-#if COCOS2D_DEBUG > 0
+#ifdef CC_USE_ASSERTS
 
 static IAssertListener* s_pAssertListener = NULL;
 
