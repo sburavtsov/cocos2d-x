@@ -34,6 +34,7 @@ THE SOFTWARE.
 //
 // all cocos2d include files
 //
+#include "ccMacros.h"
 #include "ccConfig.h"
 
 // actions
@@ -82,8 +83,6 @@ THE SOFTWARE.
 // include
 #include "CCEventType.h"
 #include "CCProtocols.h"
-#include "ccConfig.h"
-#include "ccMacros.h"
 #include "ccTypes.h"
 
 // kazmath

@@ -34,20 +34,77 @@ THE SOFTWARE.
 #include "platform/CCCommon.h"
 #include "CCStdC.h"
 
-#ifndef CCAssert
 #if COCOS2D_DEBUG > 0
-extern bool CC_DLL cc_assert_script_compatible(const char *msg);
-#define CCAssert(cond, msg) do {                              \
-      if (!(cond)) {                                          \
-        if (!cc_assert_script_compatible(msg) && strlen(msg)) \
-          cocos2d::CCLog("Assert failed: %s", msg);           \
-        CC_ASSERT(cond);                                      \
-      } \
-    } while (0)
-#else
-#define CCAssert(cond, msg)
+
+NS_CC_BEGIN;
+
+	class CC_DLL IAssertListener
+	{
+	public:
+		virtual void OnAssert(const char* szMessage, const char* szFile, int nLine) = 0;
+	};
+
+	class CC_DLL CCAssertions
+	{
+	public:
+		static void SetAssertListener(IAssertListener* pListener);
+		static void AssertMessage(const char* szMessage, const char* szFile, int nLine);
+	};
+
+NS_CC_END;
+
+	extern bool CC_DLL cc_assert_script_compatible(const char *msg);
+
+	#define ASSERT_MESSAGE_FORMAT	"%s, assert failed at line %d: %s"
+
+	#define CC_ASSERT_MESSAGE(msg, filename, line) \
+	{ \
+		cocos2d::CCAssertions::AssertMessage(msg, filename, line); \
+		CC_SYSTEM_ASSERT(false); \
+	}
+
+	#define CC_ASSERT_WITH_MESSAGE(cond, msg, filename, line) \
+	{ \
+		if (false == (cond)) \
+			CC_ASSERT_MESSAGE(msg, filename, line); \
+	}
+
+	#define CC_ASSERT_WITH_MESSAGE_EX(cond, msg, filename, line) \
+	{							\
+		if (false == (cond))	\
+		{ \
+			const char* szMessage = msg; \
+			if (NULL == szMessage || 0 == szMessage[0] || false != cc_assert_script_compatible(szMessage)) \
+				szMessage = #cond; \
+				\
+			CC_ASSERT_MESSAGE(szMessage, filename, line); \
+		} \
+	}
+	
+#ifndef CC_ASSERT
+	#define CC_ASSERT(cond) CC_ASSERT_WITH_MESSAGE(cond, #cond, __FILE__, __LINE__)
 #endif
-#endif  // CCAssert
+
+#ifndef CCAssert
+	#define CCAssert(cond, msg)	CC_ASSERT_WITH_MESSAGE_EX(cond, msg, __FILE__, __LINE__)
+#endif
+
+	#define CCSetAssertListener(ptr) cocos2d::CCAssertions::SetAssertListener(ptr)
+
+#else
+
+#ifndef CC_ASSERT
+	#define	CC_ASSERT(cond)	CC_SYSTEM_ASSERT(cond)
+#endif
+
+#ifndef CCAssert
+	#define	CCAssert(cond, msg)
+#endif
+
+	#define CCSetAssertListener(ptr)
+
+#endif	// COCOS2D_DEBUG > 0
+
 
 #include "ccConfig.h"
 

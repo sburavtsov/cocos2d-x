@@ -3,6 +3,7 @@
 #include "CCDirector.h"
 #include <algorithm>
 #include "platform/CCFileUtils.h"
+#include "ccMacros.h"
 /**
 @brief    This function change the PVRFrame show/hide setting in register.
 @param  bEnable If true show the PVRFrame window, otherwise hide.
@@ -13,6 +14,7 @@ NS_CC_BEGIN
 
 // sharedApplication pointer
 CCApplication * CCApplication::sm_pSharedApplication = 0;
+
 
 CCApplication::CCApplication()
 : m_hInstance(NULL)
