@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #import "CCApplication.h"
-
+#import "cocos2d.h"
 #import <UIKit/UIKit.h>
 
 #import "CCGeometry.h"
