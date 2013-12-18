@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include "CCStdC.h"
 
 #ifndef COCOS2D_FORCE_ASSERT
-#define COCOS2D_FORCE_ASSERT 0
+#define COCOS2D_FORCE_ASSERT 1
 #endif
 
 #if COCOS2D_DEBUG > 0 || COCOS2D_FORCE_ASSERT > 0
@@ -91,13 +91,8 @@ NS_CC_END;
 		} \
 	} while(0)
 	
-#ifndef CC_ASSERT
 	#define CC_ASSERT(cond) CC_ASSERT_WITH_MESSAGE(cond, #cond, __FILE__, __LINE__)
-#endif
-
-#ifndef CCAssert
 	#define CCAssert(cond, msg)	CC_ASSERT_WITH_MESSAGE_EX(cond, msg, __FILE__, __LINE__)
-#endif
 
 	#define CCSetAssertListener(ptr) cocos2d::CCAssertions::SetAssertListener(ptr)
 
@@ -105,13 +100,8 @@ NS_CC_END;
 
 	#undef CC_USE_ASSERTS
 
-#ifndef CC_ASSERT
 	#define	CC_ASSERT(cond)	CC_SYSTEM_ASSERT(cond)
-#endif
-
-#ifndef CCAssert
 	#define	CCAssert(cond, msg)
-#endif
 
 	#define CCSetAssertListener(ptr)
 

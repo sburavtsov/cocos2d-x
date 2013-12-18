@@ -21,7 +21,6 @@
                             __FILE__, __FUNCTION__, __LINE__, msg); \
     }
 
-#define CC_ASSERT(cond) CC_NO_MESSAGE_PSEUDOASSERT(cond)
 #define CC_SYSTEM_ASSERT(cond) CC_NO_MESSAGE_PSEUDOASSERT(cond)
 
 #define CC_UNUSED_PARAM(unusedparam) (void)unusedparam
