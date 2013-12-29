@@ -133,9 +133,6 @@ public:
     /** Whether or not the Director is paused */
     inline bool isPaused(void) { return m_bPaused; }
 
-	/** Schedule call CCApplication::sharedApplication()->applicationWillEnterForeground(); */
-	void RiseForegroundEnterFlag() { m_willEnterForegroundFlag = true; }
-	void RiseBackgroundEnterFlag() { m_willEnterBackgroundFlag = true; }
 
     /** How many frames were called since the director started */
     inline unsigned int getTotalFrames(void) { return m_uTotalFrames; }

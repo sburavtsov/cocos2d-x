@@ -51,14 +51,6 @@ public:
     {
     }
 
-    ~BitmapDC(void)
-    {
-		CCLOG("%s", "~BitmapDC (!!!11)");
-        if (m_pData)
-        {
-            delete [] m_pData;
-        }
-    }
 
     bool getBitmapFromJavaShadowStroke(	const char *text,
     									int nWidth,

@@ -1080,23 +1080,6 @@ void CCDisplayLinkDirector::mainLoop(void)
          CCPoolManager::sharedPoolManager()->pop();        
      }
 
-	if (true == m_willEnterBackgroundFlag)
-	{
-		CCNotificationCenter::sharedNotificationCenter()->postNotification(EVENT_COME_TO_BACKGROUND, NULL);
-		CCApplication::sharedApplication()->applicationDidEnterBackground();
-
-		// It's not good to change multithread variable without mutex, but ok for this time
-		m_willEnterBackgroundFlag = false;
-	}
-
-	if (true == m_willEnterForegroundFlag)
-	{
-		CCNotificationCenter::sharedNotificationCenter()->postNotification(EVENT_COME_TO_FOREGROUND, NULL);
-		CCApplication::sharedApplication()->applicationWillEnterForeground();
-
-		// It's not good to change multithread variable without mutex, but ok for this time
-		m_willEnterForegroundFlag = false;
-	}
 }
 
 void CCDisplayLinkDirector::stopAnimation(void)
