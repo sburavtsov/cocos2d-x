@@ -27,6 +27,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 
 public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
 	// ===========================================================
@@ -68,13 +69,17 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
 	// ===========================================================
 
 	@Override
-	public void onSurfaceCreated(final GL10 pGL10, final EGLConfig pEGLConfig) {
+	public void onSurfaceCreated(final GL10 pGL10, final EGLConfig pEGLConfig)
+	{
+		Log.d("GLSurfaceView.Renderer", "onSurfaceCreated");
 		Cocos2dxRenderer.nativeInit(this.mScreenWidth, this.mScreenHeight);
 		this.mLastTickInNanoSeconds = System.nanoTime();
 	}
 
 	@Override
-	public void onSurfaceChanged(final GL10 pGL10, final int pWidth, final int pHeight) {
+	public void onSurfaceChanged(final GL10 pGL10, final int pWidth, final int pHeight)
+	{
+		Log.d("GLSurfaceView.Renderer", "onSurfaceChanged");
 	}
 
 	@Override

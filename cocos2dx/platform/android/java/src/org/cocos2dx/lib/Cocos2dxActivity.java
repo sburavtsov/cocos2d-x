@@ -84,53 +84,70 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	@Override
 	protected void onResume()
 	{
-	    if (mGLSurfaceView.getVisibility() == View.GONE)
-	    {
-	    	mGLSurfaceView.setVisibility(View.VISIBLE);
-	    }
-	    
 		Cocos2dxHelper.onResume();
-		mGLSurfaceView.onResume();
 		
-		super.onResume(); 
+		if (null != mGLSurfaceView)
+		{	
+			if (mGLSurfaceView.getVisibility() == View.GONE)
+	    	{
+//				mGLSurfaceView.setVisibility(View.VISIBLE);
+	    	}
+			
+			mGLSurfaceView.onResume();	    
+		} 
+		super.onResume();
 	}
 
 	@Override
 	protected void onPause()
-	{	
+	{		
 		// http://gamedev.stackexchange.com/questions/12629/workaround-to-losing-the-opengl-context-when-android-pauses
 		// Basically the trick is to detach your GLSurfaceView from the view hierarchy
 		// from your Activity's onPause(). Since it's not in the view hierarchy
 		// at the point onPause() runs, the context never gets destroyed.
-		mGLSurfaceView.setVisibility(View.GONE); 
-		mGLSurfaceView.onPause();
+		if (null != mGLSurfaceView)
+		{
+			mGLSurfaceView.onPause();
+
+//			mGLSurfaceView.setVisibility(View.GONE);
+//			Log.e(TAG, "mGLSurfaceView.setVisibility(View.GONE)");
+		}
 		
 		Cocos2dxHelper.onPause();
 		super.onPause();
 	}
-	
+	/*
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus)
 	{  
-	    if (hasFocus && (mGLSurfaceView.getVisibility() == View.GONE))
-	    {
-	    	mGLSurfaceView.setVisibility(View.VISIBLE);
-	    }
-
+		Log.e(TAG, "onWindowFocusChanged hasFocus=" + hasFocus);
+		
+		if (null != mGLSurfaceView)
+		{
+			if (true == hasFocus)
+			{
+				//mGLSurfaceView.onResume();
+			
+				if (View.GONE == mGLSurfaceView.getVisibility())
+				{
+					Log.e(TAG, "mGLSurfaceView.setVisibility(View.VISIBLE)");
+		
+					mGLSurfaceView.setVisibility(View.VISIBLE);
+//					mGLSurfaceView.onResume();
+				}
+			}
+		}
+		
 	    super.onWindowFocusChanged(hasFocus);
 	}
-
-	@Override 
+/*
+	/*@Override 
 	protected void onStop()
 	{
 		super.onStop();
 		
-		Log.d(TAG, "onStop");
-
-		Cocos2dxHelper.onPause();
-		this.mGLSurfaceView.onPause();
 	    //android.os.Process.killProcess(android.os.Process.myPid());
-	}
+	}*/
 	
 	@Override
 	public void showDialog(final String pTitle, final String pMessage) {
@@ -149,8 +166,12 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	}
 	
 	@Override
-	public void runOnGLThread(final Runnable pRunnable) {
-		this.mGLSurfaceView.queueEvent(pRunnable);
+	public void runOnGLThread(final Runnable pRunnable)
+	{
+		if (null != mGLSurfaceView)
+		{
+			mGLSurfaceView.queueEvent(pRunnable);
+		}
 	}
 
 	// ===========================================================
@@ -174,7 +195,9 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 
         // ...add to FrameLayout
         framelayout.addView(edittext);
+        // WW add HDR icon here!
 
+        Log.e("Activity", "onCreateView()");
         // Cocos2dxGLSurfaceView
         this.mGLSurfaceView = this.onCreateView();
 
