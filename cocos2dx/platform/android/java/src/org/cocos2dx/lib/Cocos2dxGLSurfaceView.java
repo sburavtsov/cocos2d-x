@@ -161,12 +161,6 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
 	public void onResume()
 	{
 		Log.d(TAG, "onResume >>>");
-		
-		// Calling this method will recreate the OpenGL display and resume the rendering thread.
-		// Must not be called before a renderer has been set.
-		
-		//super.onResume();
-		// Note that you never call the GLSurfaceView's onPause() and onResume()
 
 		MyRunnable event = new MyRunnable( new Runnable()
 		{
@@ -179,6 +173,11 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
 		this.queueEvent(event);
 		event.WaitForFinish(MAX_WAIT_TIME);
 		
+		// Calling this method will recreate the OpenGL display and resume the rendering thread.
+		// Must not be called before a renderer has been set.
+		//super.onResume();
+		// Note that you never call the GLSurfaceView's onPause() and onResume()
+		
 		Log.d(TAG, "<<< onResume");
 	}
 
@@ -186,10 +185,6 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
 	public void onPause()
 	{
 		Log.d(TAG, "onPause >>>");
-		
-		// Calling this method will pause the rendering thread
-		//super.onPause();
-		// Note that you never call the GLSurfaceView's onPause() and onResume()
 				
 		MyRunnable event = new MyRunnable( new Runnable()
 		{
@@ -201,6 +196,10 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
 		
 		this.queueEvent(event);
 		event.WaitForFinish(MAX_WAIT_TIME);
+		
+		// Calling this method will pause the rendering thread
+		//super.onPause();
+		// Note that you never call the GLSurfaceView's onPause() and onResume()
 		
 		Log.d("GLSurfaceView", "<<< onPause");
 	}

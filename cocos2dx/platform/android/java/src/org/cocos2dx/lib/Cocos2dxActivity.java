@@ -84,18 +84,18 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	@Override
 	protected void onResume()
 	{
+		super.onResume();
 		Cocos2dxHelper.onResume();
 		
 		if (null != mGLSurfaceView)
 		{	
 			if (mGLSurfaceView.getVisibility() == View.GONE)
 	    	{
-//				mGLSurfaceView.setVisibility(View.VISIBLE);
+				mGLSurfaceView.setVisibility(View.VISIBLE);
 	    	}
 			
-			mGLSurfaceView.onResume();	    
+			mGLSurfaceView.onResume();
 		} 
-		super.onResume();
 	}
 
 	@Override
@@ -109,14 +109,14 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 		{
 			mGLSurfaceView.onPause();
 
-//			mGLSurfaceView.setVisibility(View.GONE);
-//			Log.e(TAG, "mGLSurfaceView.setVisibility(View.GONE)");
+			mGLSurfaceView.setVisibility(View.GONE);
+			Log.e(TAG, "mGLSurfaceView.setVisibility(View.GONE)");
 		}
 		
 		Cocos2dxHelper.onPause();
 		super.onPause();
 	}
-	/*
+	
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus)
 	{  
