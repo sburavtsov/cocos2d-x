@@ -149,7 +149,6 @@ bool CCUserDefault::m_sbIsFilePathInitialized = false;
  */
 CCUserDefault::~CCUserDefault()
 {
-	CC_SAFE_DELETE(m_spUserDefault);
     m_spUserDefault = NULL;
 }
 
@@ -160,7 +159,7 @@ CCUserDefault::CCUserDefault()
 
 void CCUserDefault::purgeSharedUserDefault()
 {
-    m_spUserDefault = NULL;
+    CC_SAFE_DELETE(m_spUserDefault);
 }
 
  bool CCUserDefault::getBoolForKey(const char* pKey)
