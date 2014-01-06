@@ -106,6 +106,14 @@ CCNode::CCNode(void)
 CCNode::~CCNode(void)
 {
     CCLOGINFO( "cocos2d: deallocing" );
+
+	removeAllChildren();
+	cleanup();
+
+	// children
+	CC_SAFE_RELEASE(m_pChildren);
+
+	// -------------------------------------------------------
     
     unregisterScriptHandler();
     if (m_nUpdateScriptHandler)
@@ -121,24 +129,8 @@ CCNode::~CCNode(void)
     CC_SAFE_RELEASE(m_pGrid);
     CC_SAFE_RELEASE(m_pShaderProgram);
     CC_SAFE_RELEASE(m_pUserObject);
-
-    if(m_pChildren && m_pChildren->count() > 0)
-    {
-        CCObject* child;
-        CCARRAY_FOREACH(m_pChildren, child)
-        {
-            CCNode* pChild = (CCNode*) child;
-            if (pChild)
-            {
-                pChild->m_pParent = NULL;
-            }
-        }
-    }
-
-    // children
-    CC_SAFE_RELEASE(m_pChildren);
     
-          // m_pComsContainer
+    // m_pComsContainer
     m_pComponentContainer->removeAll();
     CC_SAFE_DELETE(m_pComponentContainer);
 }
