@@ -220,6 +220,8 @@ namespace cocos2d
 		bool getFileEntry(ZipEntryInfo * outEntry, const std::string &fileName);
 		bool getFileData(void * dest, unsigned long fileSize, ZipEntryInfo & entry);
 
+		//void set
+		void setFileName(const char * fileName);
 		const std::string & getFileName() const;
 
     private:

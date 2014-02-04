@@ -451,7 +451,6 @@ public:
 ZipFile::ZipFile(const std::string &zipFile, const std::string &filter)
 : m_data(new ZipFilePrivate)
 {
-	m_data->fileName = zipFile;
     m_data->zipFile = unzOpen(zipFile.c_str());
     if (m_data->zipFile)
     {
@@ -599,6 +598,11 @@ unsigned char * ZipFile::getFileData(const std::string &fileName, unsigned long 
     } while (0);
     
     return pBuffer;
+}
+
+void ZipFile::setFileName(const char * fileName)
+{
+	(m_data->fileName) = fileName;
 }
 
 const std::string & ZipFile::getFileName() const
