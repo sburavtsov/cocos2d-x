@@ -292,9 +292,9 @@ void CCLabelTTF::setFontName(const char *fontName)
 // Helper
 bool CCLabelTTF::updateTexture()
 {
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-	return false;
-#endif
+// #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+// 	return false;
+// #endif
 
     CCTexture2D *tex;
     tex = new CCTexture2D();
