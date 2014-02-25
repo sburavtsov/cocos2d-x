@@ -32,6 +32,14 @@
 
 #include "curl/curl.h"
 
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+
+#include "jni/JniHelper.h"
+
+#endif
+
+
 NS_CC_EXT_BEGIN
 
 static pthread_t        s_networkThread;
@@ -94,7 +102,18 @@ static int processDeleteTask(CCHttpRequest *request, write_callback callback, vo
 
 // Worker thread
 static void* networkThread(void *data)
-{    
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+
+	JavaVM * javaVM = JniHelper::getJavaVM();
+	JNIEnv * javaEnv = NULL;
+	
+	javaVM->GetEnv((void**)&javaEnv, JNI_VERSION_1_4);
+	javaVM->AttachCurrentThread(&javaEnv, 0);
+
+#endif
+
+
     CCHttpRequest *request = NULL;
     
     while (true) 
