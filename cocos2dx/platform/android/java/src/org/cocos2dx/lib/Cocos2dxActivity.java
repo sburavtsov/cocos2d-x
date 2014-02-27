@@ -145,6 +145,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 			if (haveFocus && isResumed)
 			{
 				mGLSurfaceView.onResume();
+				isResumed = false; // Do not resume surface until next Activity.OnResume callback
 			}
 		}
 	}
