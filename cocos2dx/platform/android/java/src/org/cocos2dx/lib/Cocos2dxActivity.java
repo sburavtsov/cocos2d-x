@@ -53,7 +53,8 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	protected static Activity me = null;
 	private static Context sContext = null;
 	
-	private int resumeCount;
+	private boolean haveFocus;
+	private boolean isResumed;
 	
 	public static Context getContext() {
 		return sContext;
@@ -66,7 +67,8 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	@Override
 	protected void onCreate(final Bundle savedInstanceState)
 	{
-		resumeCount = 0;
+		haveFocus = false;
+		isResumed = false; 
 		
 		super.onCreate(savedInstanceState);
 		sContext = this;
@@ -90,33 +92,26 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	protected void onResume()
 	{
 		super.onResume();
-		Cocos2dxHelper.onResume();
+		isResumed = true;
 		
-		OnResumeRenderer();
-		/*
-		if (null != mGLSurfaceView)
-		{	
-			if (mGLSurfaceView.getVisibility() == View.GONE)
-	    	{
-				mGLSurfaceView.setVisibility(View.VISIBLE);
-	    	}
-			
-			wantResumeSurface = true;
-			//mGLSurfaceView.onResume();
-		} */
+		Cocos2dxHelper.onResume();
+		TryResumeRenderer();
 	}
 
 	@Override
 	protected void onPause()
-	{		
+	{	
+		isResumed = false;
 		// http://gamedev.stackexchange.com/questions/12629/workaround-to-losing-the-opengl-context-when-android-pauses
 		// Basically the trick is to detach your GLSurfaceView from the view hierarchy
 		// from your Activity's onPause(). Since it's not in the view hierarchy
 		// at the point onPause() runs, the context never gets destroyed.
 
-		mGLSurfaceView.onPause();
-		mGLSurfaceView.setVisibility(View.GONE);
-		Log.e(TAG, "mGLSurfaceView.setVisibility(View.GONE)");
+		if (null != mGLSurfaceView)
+		{
+			mGLSurfaceView.onPause();
+			mGLSurfaceView.setVisibility(View.GONE);
+		}
 		
 		Cocos2dxHelper.onPause();
 		super.onPause();
@@ -124,27 +119,33 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus)
-	{  
+	{
 		super.onWindowFocusChanged(hasFocus);
 		Log.e(TAG, "onWindowFocusChanged hasFocus=" + hasFocus);
+	
+		haveFocus = hasFocus;
 		
 		if (true == hasFocus)
 		{
-			mGLSurfaceView.setVisibility(View.VISIBLE);
-			OnResumeRenderer();
+			TryResumeRenderer();
 		}
 	}
 	
 	
-	private void OnResumeRenderer()
+	private void TryResumeRenderer()
 	{
-		// We need both callbacks OnResume + onWindowFocusChanged
-		resumeCount++;
-		
-		if (resumeCount > 1)
+		if (null != mGLSurfaceView)
 		{
-			mGLSurfaceView.onResume();
-			resumeCount = 0;	
+			if (mGLSurfaceView.getVisibility() == View.GONE)
+			{
+				mGLSurfaceView.setVisibility(View.VISIBLE);
+			}
+		
+			// We need both callbacks OnResume + onWindowFocusChanged
+			if (haveFocus && isResumed)
+			{
+				mGLSurfaceView.onResume();
+			}
 		}
 	}
 	
