@@ -122,12 +122,12 @@ ccLanguageType CCApplication::getCurrentLanguage()
 
 void CCApplication::openURL(const char* pszUrl)
 {
-    JniMethodInfo minfo;
+	JniMethodInfo minfo;
     
     if(JniHelper::getStaticMethodInfo(minfo,
-                                      "org/cocos2dx/lib/Cocos2dxActivity",
-                                      "openURL",
-                                      "(Ljava/lang/String;)V"))
+		"com/playstorm/buildanempire/platform_android",
+		"openURL",
+		"(Ljava/lang/String;)V"))
     {
         jstring StringArg1 = minfo.env->NewStringUTF(pszUrl);
         minfo.env->CallStaticVoidMethod(minfo.classID, minfo.methodID, StringArg1);

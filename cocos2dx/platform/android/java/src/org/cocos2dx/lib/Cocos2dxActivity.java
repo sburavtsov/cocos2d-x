@@ -229,13 +229,6 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     	Log.d(TAG, "new Cocos2dxGLSurfaceView!");
     	return new Cocos2dxGLSurfaceView(this);
     }
-		
-		// Opens URL as the new activity
-		public static void openURL(String url) {
-			Intent i = new Intent(Intent.ACTION_VIEW);
-			i.setData(Uri.parse(url));
-			me.startActivity(i);
-		}
 
    private final static boolean isAndroidEmulator() {
       String model = Build.MODEL;
