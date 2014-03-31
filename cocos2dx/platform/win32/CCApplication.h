@@ -1,10 +1,10 @@
 #ifndef __CC_APPLICATION_WIN32_H__
 #define __CC_APPLICATION_WIN32_H__
 
+#include <string>
 #include "CCStdC.h"
 #include "platform/CCCommon.h"
 #include "platform/CCApplicationProtocol.h"
-#include <string>
 
 NS_CC_BEGIN
 
