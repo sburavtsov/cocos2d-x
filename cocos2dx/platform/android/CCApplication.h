@@ -36,7 +36,8 @@ public:
     @return Current language config
     */
     virtual ccLanguageType getCurrentLanguage();
-    
+    virtual std::string getCountryCode();
+	
     /**
      @brief Get target platform
      */

@@ -63,6 +63,7 @@ public:
      @brief Get target platform
      */
     virtual TargetPlatform getTargetPlatform() = 0;
+	virtual std::string getCountryCode() = 0;
 };
 
 // end of platform group
