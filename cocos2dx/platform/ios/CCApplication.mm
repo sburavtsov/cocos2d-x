@@ -59,6 +59,14 @@ void CCApplication::setAnimationInterval(double interval)
     [[CCDirectorCaller sharedDirectorCaller] setAnimationInterval: interval ];
 }
 
+std::string CCApplication::getCountryCode() {
+	
+	NSLocale *locale = [NSLocale currentLocale];
+	NSString *countryCode = [locale objectForKey: NSLocaleCountryCode];
+	return [countryCode UTF8String];
+}
+
+
 void CCApplication::openURL(const char* pszUrl)
 {
 	NSString *msg = [NSString stringWithCString:pszUrl encoding:NSASCIIStringEncoding];

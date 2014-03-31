@@ -26,6 +26,7 @@ THE SOFTWARE.
 #define __CC_APPLICATION_IOS_H__
 
 #include "platform/CCCommon.h"
+#include <string>
 #include "platform/CCApplicationProtocol.h"
 
 NS_CC_BEGIN
@@ -67,6 +68,8 @@ public:
     virtual TargetPlatform getTargetPlatform();
 	
 	void openURL(const char* pszUrl);
+
+	std::string getCountryCode();
 
 protected:
     static CCApplication * sm_pSharedApplication;
