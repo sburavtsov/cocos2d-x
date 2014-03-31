@@ -62,9 +62,14 @@ CCApplication* CCApplication::sharedApplication()
     return sm_pSharedApplication;
 }
 
+std::string CCApplication::getCountryCode()
+{
+	return getCurrentLanguageJNI();
+}
+
 ccLanguageType CCApplication::getCurrentLanguage()
 {
-    std::string languageName = getCurrentLanguageJNI();
+    std::string languageName = getCountryCode();
     const char* pLanguageName = languageName.c_str();
     ccLanguageType ret = kLanguageEnglish;
 

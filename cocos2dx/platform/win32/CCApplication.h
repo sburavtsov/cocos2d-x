@@ -30,6 +30,7 @@ public:
     /* override functions */
     virtual void setAnimationInterval(double interval);
     virtual ccLanguageType getCurrentLanguage();
+	virtual std::string getCountryCode();
     
     /**
      @brief Get target platform

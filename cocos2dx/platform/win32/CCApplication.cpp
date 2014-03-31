@@ -108,6 +108,32 @@ CCApplication* CCApplication::sharedApplication()
     return sm_pSharedApplication;
 }
 
+
+std::string CCApplication::getCountryCode()
+{
+	ccLanguageType currentLangType = getCurrentLanguage();
+	switch (currentLangType)
+	{
+		case kLanguageRussian:		return "ru";
+		case kLanguageChinese:		return "cn";
+		case kLanguageFrench:		return "fr";
+		case kLanguageItalian:		return "it";
+		case kLanguageGerman:		return "de";
+		case kLanguageSpanish:		return "es";
+		case kLanguageKorean:		return "kr"; // KR for South Korea, KP for North Korea
+		case kLanguageJapanese:		return "jp";
+		case kLanguageHungarian:	return "hu";
+		case kLanguagePortuguese:	return "pt";
+		//		case kLanguageArabic:		return "ar"; // AR for argentina!!!
+
+		//case kLanguageEnglish:
+	}
+
+	// english is default
+	return "en";
+}
+
+
 ccLanguageType CCApplication::getCurrentLanguage()
 {
     ccLanguageType ret = kLanguageEnglish;
