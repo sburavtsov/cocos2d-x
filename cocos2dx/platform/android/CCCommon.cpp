@@ -53,11 +53,9 @@ void CCLog(const char * pszFormat, ...)
 		fprintf(logFile, "%s\n", buf);
 		fflush(logFile);
 		va_end(args);
-
-		__android_log_print(ANDROID_LOG_DEBUG, "cocos2d-x debug info",  "%s", buf);
-		
-		// -------------------------------------------------------------------------
 	}
+	
+	__android_log_print(ANDROID_LOG_DEBUG, "cocos2d-x debug info",  "%s", buf);
 	
 	// -------------------------------------------------------------------------
 	//TestFlight.log("Logging info here…");
