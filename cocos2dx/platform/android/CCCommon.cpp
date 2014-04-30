@@ -45,7 +45,10 @@ void CCLog(const char * pszFormat, ...)
 	
 	if (NULL == logFile)
 	{
-		logFile = fopen("/mnt/sdcard/playstorm/buildanempire/log.txt", "wt");
+		char logFileName[16384];
+		sprintf(logFileName, "%s/Android/obb/%s/log.txt", getExtStoragePath(), getPackageNameJNI().c_str());		
+		
+		logFile = fopen(logFileName, "wt");
 	}
 		
 	if (NULL != logFile)
