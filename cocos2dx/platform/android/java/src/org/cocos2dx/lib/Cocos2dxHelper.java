@@ -32,6 +32,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
 import android.os.Build;
+import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
@@ -69,6 +70,7 @@ public class Cocos2dxHelper {
 		Cocos2dxHelper.sPackageName = applicationInfo.packageName;
 		Cocos2dxHelper.sFileDirectory = pContext.getFilesDir().getAbsolutePath();
 		Cocos2dxHelper.nativeSetApkPath(applicationInfo.sourceDir);
+		Cocos2dxHelper.nativeSetExtStoragePath( Environment.getExternalStorageDirectory().getPath() );
 		Cocos2dxHelper.nativeSetDeviceModel(Build.MODEL);
 
 		Cocos2dxHelper.sCocos2dxAccelerometer = new Cocos2dxAccelerometer(pContext);
@@ -92,6 +94,7 @@ public class Cocos2dxHelper {
 	// ===========================================================
 
 	private static native void nativeSetApkPath(final String pApkPath);
+	private static native void nativeSetExtStoragePath(final String path);
 	private static native void nativeSetDeviceModel(final String deviceModel);
 
 	private static native void nativeSetEditTextDialogResult(final byte[] pBytes);
