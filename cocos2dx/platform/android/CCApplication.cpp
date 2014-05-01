@@ -130,8 +130,8 @@ void CCApplication::openURL(const char* pszUrl)
 	JniMethodInfo minfo;
     
     if(JniHelper::getStaticMethodInfo(minfo,
-		"com/playstorm/buildanempire/platform_android",
-		"openURL",
+		"com/almostart/lib/ArtHelpers",
+		"OpenURL",
 		"(Ljava/lang/String;)V"))
     {
         jstring StringArg1 = minfo.env->NewStringUTF(pszUrl);
