@@ -297,10 +297,10 @@ bool CCEGLView::Create()
 
         // create window
         m_hWnd = CreateWindowEx(
-            WS_EX_APPWINDOW | WS_EX_WINDOWEDGE,    // Extended Style For The Window
+            NULL /* WS_EX_APPWINDOW | WS_EX_WINDOWEDGE */ ,    // Extended Style For The Window
             kWindowClassName,                                    // Class Name
             wszBuf,                                                // Window Title
-            WS_CAPTION | WS_POPUPWINDOW | WS_MINIMIZEBOX,        // Defined Window Style
+            WS_EX_TOPMOST | WS_POPUP /* WS_CAPTION | WS_POPUPWINDOW | WS_MINIMIZEBOX */ ,        // Defined Window Style
             0, 0,                                                // Window Position
             //TODO: Initializing width with a large value to avoid getting a wrong client area by 'GetClientRect' function.
             1000,                                               // Window Width
