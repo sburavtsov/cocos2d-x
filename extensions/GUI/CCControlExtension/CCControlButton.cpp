@@ -209,7 +209,13 @@ void CCControlButton::setHighlighted(bool enabled)
     }
     else
     {
-        m_eState = CCControlStateNormal;
+		if (false == m_bEnabled) {
+			
+			m_eState = CCControlStateDisabled;
+		} else {
+
+			m_eState = CCControlStateNormal;
+		}
     }
     
     CCControl::setHighlighted(enabled);

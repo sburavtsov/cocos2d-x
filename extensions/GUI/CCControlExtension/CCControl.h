@@ -116,6 +116,8 @@ public:
     
     virtual bool isOpacityModifyRGB();
     virtual void setOpacityModifyRGB(bool bOpacityModifyRGB);
+	
+	virtual void setSwallowTouches(bool swallowTouches);
 
 protected:
     bool m_bEnabled;
