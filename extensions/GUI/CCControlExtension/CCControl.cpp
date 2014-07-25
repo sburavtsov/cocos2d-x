@@ -111,13 +111,14 @@ void CCControl::onExit()
 }
 
 void CCControl::setSwallowTouches(bool swallowTouches) {
-	
-	CCTargetedTouchHandler *handler = reinterpret_cast<CCTargetedTouchHandler *>(CCDirector::sharedDirector()->getTouchDispatcher()->findHandler(this));
+
+	/*
+	CCTargetedTouchHandler *handler = dynamic_cast<CCTargetedTouchHandler *>(CCDirector::sharedDirector()->getTouchDispatcher()->findHandler(this));
 	
 	if (NULL != handler) {
 		
 		handler->setSwallowsTouches(swallowTouches);
-	}
+	}*/
 }
 
 void CCControl::sendActionsForControlEvents(CCControlEvent controlEvents)
