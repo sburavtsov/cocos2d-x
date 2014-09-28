@@ -83,6 +83,7 @@ bool CCTMXLayer::initWithTilesetInfo(CCTMXTilesetInfo *tilesetInfo, CCTMXLayerIn
         // mapInfo
         m_tMapTileSize = mapInfo->getTileSize();
         m_uLayerOrientation = mapInfo->getOrientation();
+		setTileScale( mapInfo->getTileScale() );
 
         // offset (after layer orientation is set);
         CCPoint offset = this->calculateLayerOffset(layerInfo->m_tOffset);
