@@ -110,6 +110,7 @@ CCTMXLayer::CCTMXLayer()
 ,m_pReusedTile(NULL)
 ,m_pAtlasIndexArray(NULL)    
 ,m_gidToTileNameDic(NULL)
+,m_tileScale(1.f)
 {}
 
 CCTMXLayer::~CCTMXLayer()
@@ -247,6 +248,8 @@ void CCTMXLayer::setupTileSprite(CCSprite* sprite, CCPoint pos, unsigned int gid
     sprite->setVertexZ((float)vertexZForPos(pos));
     sprite->setAnchorPoint(CCPointZero);
     sprite->setOpacity(m_cOpacity);
+
+	sprite->setScale( getTileScale() );
 
     //issue 1264, flip can be undone as well
     sprite->setFlipX(false);

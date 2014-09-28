@@ -85,6 +85,9 @@ class CC_DLL CCTMXLayer : public CCSpriteBatchNode
     CC_SYNTHESIZE(unsigned int, m_uLayerOrientation, LayerOrientation);
     /** properties from the layer. They can be added using Tiled */
     CC_PROPERTY(CCDictionary*, m_pProperties, Properties);
+
+	CC_SYNTHESIZE(float, m_tileScale, TileScale);
+
 public:
     CCTMXLayer();
     virtual ~CCTMXLayer();
