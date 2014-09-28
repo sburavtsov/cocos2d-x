@@ -170,6 +170,9 @@ public:
     CC_SYNTHESIZE(bool, m_bStoringCharacters, StoringCharacters);
     /// properties
     CC_PROPERTY(CCDictionary*, m_pProperties, Properties);
+
+	CC_SYNTHESIZE(float, m_tileScale, TileScale);
+
 public:    
     CCTMXMapInfo();
     virtual ~CCTMXMapInfo();

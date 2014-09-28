@@ -213,6 +213,7 @@ CCTMXMapInfo::CCTMXMapInfo()
 , m_pProperties(NULL)
 , m_pTileProperties(NULL)
 , m_uCurrentFirstGID(0)
+, m_tileScale(1.f)
 {
 }
 
