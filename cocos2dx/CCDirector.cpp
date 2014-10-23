@@ -326,13 +326,14 @@ void CCDirector::calculateDeltaTime(void)
         m_fDeltaTime = MAX(0, m_fDeltaTime);
     }
 
-#ifdef DEBUG
+//#ifdef DEBUG
     // If we are debugging our code, prevent big delta time
-    if(m_fDeltaTime > 0.2f)
+    if (m_fDeltaTime > 0.2f)
     {
+		CCLog("BIG_DELTA_TIME OVERRIDE (was %f)", m_fDeltaTime);
         m_fDeltaTime = 1 / 60.0f;
     }
-#endif
+//#endif
 
     *m_pLastUpdate = now;
 }
