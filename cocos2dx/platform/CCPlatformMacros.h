@@ -208,6 +208,11 @@ public: virtual void set##funName(varType var)   \
 
 // cocos2d debug
 #if !defined(COCOS2D_DEBUG) || COCOS2D_DEBUG == 0
+
+#define CCLOG(format, ...)      cocos2d::CCLog(format, ##__VA_ARGS__)
+#define CCLOGERROR(format,...)  cocos2d::CCLog(format, ##__VA_ARGS__)
+#define CCLOGINFO(format,...)   do {} while (0)
+#define CCLOGWARN(...) __CCLOGWITHFUNCTION(__VA_ARGS__)
 /*
 #define CCLOG(...)       do {} while (0)
 #define CCLOGINFO(...)   do {} while (0)
