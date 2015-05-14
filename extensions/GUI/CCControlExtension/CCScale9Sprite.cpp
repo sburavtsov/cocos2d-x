@@ -628,7 +628,8 @@ CCScale9Sprite* CCScale9Sprite::createWithSpriteFrameName(const char* spriteFram
 CCScale9Sprite* CCScale9Sprite::resizableSpriteWithCapInsets(CCRect capInsets)
 {
     CCScale9Sprite* pReturn = new CCScale9Sprite();
-    if ( pReturn && pReturn->initWithBatchNode(_scale9Image, m_spriteRect, capInsets) )
+    CCSpriteBatchNode *sbNode = CCSpriteBatchNode::createWithTexture(_scale9Image->getTexture());
+    if ( pReturn && pReturn->initWithBatchNode(sbNode, m_spriteRect, capInsets) )
     {
         pReturn->autorelease();
         return pReturn;
