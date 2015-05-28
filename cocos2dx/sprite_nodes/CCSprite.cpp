@@ -121,13 +121,13 @@ CCSprite* CCSprite::createWithSpriteFrame(CCSpriteFrame *pSpriteFrame)
 CCSprite* CCSprite::createWithSpriteFrameName(const char *pszSpriteFrameName)
 {
     CCSpriteFrame *pFrame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(pszSpriteFrameName);
-/*    
+    
 #if COCOS2D_DEBUG > 0
     char msg[256] = {0};
     sprintf(msg, "Invalid spriteFrameName: %s", pszSpriteFrameName);
     CCAssert(pFrame != NULL, msg);
 #endif
-  */  
+    
     return createWithSpriteFrame(pFrame);
 }
 
@@ -230,7 +230,7 @@ bool CCSprite::initWithFile(const char *pszFilename)
     }
 
     // don't release here.
-    // when load texture failed, it's better to get a "transparent" sprite then a crashed program
+    // when load texture failed, it's better to get a "transparent" sprite than a crashed program
     // this->release(); 
     return false;
 }
@@ -246,7 +246,7 @@ bool CCSprite::initWithFile(const char *pszFilename, const CCRect& rect)
     }
 
     // don't release here.
-    // when load texture failed, it's better to get a "transparent" sprite then a crashed program
+    // when load texture failed, it's better to get a "transparent" sprite than a crashed program
     // this->release(); 
     return false;
 }
@@ -365,9 +365,9 @@ void CCSprite::setVertexRect(const CCRect& rect)
     m_obRect = rect;
 }
 
-void CCSprite::setTextureCoords(CCRect rect)
+void CCSprite::setTextureCoords(const CCRect& _rect)
 {
-    rect = CC_RECT_POINTS_TO_PIXELS(rect);
+    CCRect rect = CC_RECT_POINTS_TO_PIXELS(_rect);
 
     CCTexture2D *tex = m_pobBatchNode ? m_pobTextureAtlas->getTexture() : m_pobTexture;
     if (! tex)

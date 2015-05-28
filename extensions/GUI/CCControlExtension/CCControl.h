@@ -85,7 +85,7 @@ typedef unsigned int CCControlState;
  *
  * To use the CCControl you have to subclass it.
  */
-class CCControl : public CCLayerRGBA
+class CC_EX_DLL CCControl : public CCLayerRGBA
 {
 
     //CCRGBAProtocol
@@ -116,8 +116,6 @@ public:
     
     virtual bool isOpacityModifyRGB();
     virtual void setOpacityModifyRGB(bool bOpacityModifyRGB);
-	
-	virtual void setSwallowTouches(bool swallowTouches);
 
 protected:
     bool m_bEnabled;
@@ -132,12 +130,26 @@ protected:
     CCDictionary* m_pDispatchTable;
 
 public:
+    /**
+     *  @js ctor
+     */
     CCControl();
     virtual bool init(void);
+    /**
+     *  @js NA
+     *  @lua NA
+     */
     virtual ~CCControl();
 
-
+    /**
+     *  @js NA
+     *  @lua NA
+     */
     virtual void onEnter();
+    /**
+     *  @js NA
+     *  @lua NA
+     */
     virtual void onExit();
     virtual void registerWithTouchDispatcher();
 
@@ -257,7 +269,13 @@ protected:
 
     static CCControl* create();
 public:
+    /**
+     *  @js NA
+     */
     void addHandleOfControlEvent(int nFunID,CCControlEvent controlEvent);
+    /**
+     *  @js NA
+     */
     void removeHandleOfControlEvent(CCControlEvent controlEvent);
 private:
     int  getHandleOfControlEvent(CCControlEvent controlEvent);

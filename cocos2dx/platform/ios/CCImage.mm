@@ -187,6 +187,9 @@ static CGSize _calculateStringSize(NSString *str, id font, CGSize *constrainSize
         dim.height += tmp.height;
     }
     
+    dim.width = ceilf(dim.width);
+    dim.height = ceilf(dim.height);
+    
     return dim;
 }
 
@@ -331,7 +334,7 @@ static bool _initWithString(const char * pText, cocos2d::CCImage::ETextAlign eAl
         // take care of stroke if needed
         if ( pInfo->hasStroke )
         {
-            CGContextSetTextDrawingMode(context, kCGTextStroke);
+            CGContextSetTextDrawingMode(context, kCGTextFillStroke);
             CGContextSetRGBStrokeColor(context, pInfo->strokeColorR, pInfo->strokeColorG, pInfo->strokeColorB, 1);
             CGContextSetLineWidth(context, pInfo->strokeSize);
         }
@@ -363,16 +366,16 @@ static bool _initWithString(const char * pText, cocos2d::CCImage::ETextAlign eAl
         // compute the rect used for rendering the text
         // based on wether shadows or stroke are enabled
         
-        float textOriginX  = 0.0f;
-        float textOrigingY = 0.0f;
+        float textOriginX  = 0.0;
+        float textOrigingY = 0.0;
         
-        float textWidth    = dim.width;
-        float textHeight   = dim.height;
+        float textWidth    = dim.width  - shadowStrokePaddingX;
+        float textHeight   = dim.height - shadowStrokePaddingY;
         
         
         if ( pInfo->shadowOffset.width < 0 )
         {
-            textOriginX = shadowStrokePaddingX / 2;
+            textOriginX = shadowStrokePaddingX;
         }
         else
         {
@@ -385,7 +388,7 @@ static bool _initWithString(const char * pText, cocos2d::CCImage::ETextAlign eAl
         }
         else
         {
-            textOrigingY = startH - shadowStrokePaddingY / 2;
+            textOrigingY = startH - shadowStrokePaddingY;
         }
         
         
@@ -393,15 +396,6 @@ static bool _initWithString(const char * pText, cocos2d::CCImage::ETextAlign eAl
 		// XXX: ios7 casting
         [str drawInRect:CGRectMake(textOriginX, textOrigingY, textWidth, textHeight) withFont:font lineBreakMode:NSLineBreakByWordWrapping alignment:(NSTextAlignment)align];
         
-        textWidth    = dim.width - shadowStrokePaddingX;
-        textHeight   = dim.height - shadowStrokePaddingY;
-
-        // Draw filled text.  This will make sure it's clearly readable, while leaving some outline behind it.
-        CGContextSetTextDrawingMode(context, kCGTextFill);
-        CGContextSetRGBFillColor(context, pInfo->tintColorR, pInfo->tintColorG, pInfo->tintColorB, 1);
-
-        [str drawInRect:CGRectMake(textOriginX + shadowStrokePaddingX / 2.0f, textOrigingY, textWidth, textHeight) withFont:font lineBreakMode:NSLineBreakByWordWrapping alignment:(NSTextAlignment)align];
-
         // pop the context
         UIGraphicsPopContext();
         

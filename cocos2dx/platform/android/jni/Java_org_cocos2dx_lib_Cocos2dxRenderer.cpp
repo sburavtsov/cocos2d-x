@@ -14,33 +14,16 @@ extern "C" {
         cocos2d::CCDirector::sharedDirector()->mainLoop();
     }
 
-    JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeOnPause()
-	{
-		if (CCDirector::sharedDirector()->getOpenGLView())
-		{
-			__android_log_print(ANDROID_LOG_DEBUG, "Cocos2dxRenderer", "nativeOnPause");
-		
-			CCApplication::sharedApplication()->applicationDidEnterBackground();
-	//		CCNotificationCenter::sharedNotificationCenter()->postNotification(EVENT_COME_TO_BACKGROUND, NULL);
+    JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeOnPause() {
+        CCApplication::sharedApplication()->applicationDidEnterBackground();
 
-		}
-		else
-		{
-			__android_log_print(ANDROID_LOG_DEBUG, "Cocos2dxRenderer", "nativeOnPause - NO VIEW");
-		}
+        CCNotificationCenter::sharedNotificationCenter()->postNotification(EVENT_COME_TO_BACKGROUND, NULL);
     }
 
-    JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeOnResume()
-	{
-        if (CCDirector::sharedDirector()->getOpenGLView())
-		{
-			__android_log_print(ANDROID_LOG_DEBUG, "Cocos2dxRenderer", "nativeOnResume");
-			CCApplication::sharedApplication()->applicationWillEnterForeground();
+    JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeOnResume() {
+        if (CCDirector::sharedDirector()->getOpenGLView()) {
+            CCApplication::sharedApplication()->applicationWillEnterForeground();
         }
-		else
-		{
-			__android_log_print(ANDROID_LOG_DEBUG, "Cocos2dxRenderer", "nativeOnResume - NO VIEW");
-		}
     }
 
     JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeInsertText(JNIEnv* env, jobject thiz, jstring text) {

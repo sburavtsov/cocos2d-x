@@ -110,17 +110,6 @@ void CCControl::onExit()
     CCLayer::onExit();
 }
 
-void CCControl::setSwallowTouches(bool swallowTouches) {
-
-	/*
-	CCTargetedTouchHandler *handler = dynamic_cast<CCTargetedTouchHandler *>(CCDirector::sharedDirector()->getTouchDispatcher()->findHandler(this));
-	
-	if (NULL != handler) {
-		
-		handler->setSwallowsTouches(swallowTouches);
-	}*/
-}
-
 void CCControl::sendActionsForControlEvents(CCControlEvent controlEvents)
 {
     // For each control events
@@ -143,7 +132,11 @@ void CCControl::sendActionsForControlEvents(CCControlEvent controlEvents)
             {
                 int nHandler = this->getHandleOfControlEvent(controlEvents);
                 if (-1 != nHandler) {
-                    CCScriptEngineManager::sharedManager()->getScriptEngine()->executeEvent(nHandler,"",this);
+                    CCArray* pArrayArgs = CCArray::createWithCapacity(3);
+                    pArrayArgs->addObject(CCString::create(""));
+                    pArrayArgs->addObject(this);
+                    pArrayArgs->addObject(CCInteger::create(1 << i));
+                    CCScriptEngineManager::sharedManager()->getScriptEngine()->executeEventWithArgs(nHandler, pArrayArgs);
                 }
             }
         }
@@ -280,7 +273,7 @@ bool CCControl::isTouchInside(CCTouch* touch)
 
 CCArray* CCControl::dispatchListforControlEvent(CCControlEvent controlEvent)
 {
-    CCArray* invocationList = (CCArray*)m_pDispatchTable->objectForKey(controlEvent);
+    CCArray* invocationList = static_cast<CCArray*>(m_pDispatchTable->objectForKey((int)controlEvent));
 
     // If the invocation list does not exist for the  dispatch table, we create it
     if (invocationList == NULL)

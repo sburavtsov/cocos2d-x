@@ -36,14 +36,11 @@ public:
     @return Current language config
     */
     virtual ccLanguageType getCurrentLanguage();
-    virtual std::string getCountryCode();
-	
+    
     /**
      @brief Get target platform
      */
     virtual TargetPlatform getTargetPlatform();
-		
-		void openURL(const char* pszUrl);
 
 protected:
     static CCApplication * sm_pSharedApplication;

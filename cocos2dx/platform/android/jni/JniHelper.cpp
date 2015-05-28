@@ -43,26 +43,36 @@ extern "C"
     // java vm helper function
     //////////////////////////////////////////////////////////////////////////
 
+    static pthread_key_t s_threadKey;
+
+    static void detach_current_thread (void *env) {
+        JAVAVM->DetachCurrentThread();
+    }
+    
     static bool getEnv(JNIEnv **env)
     {
         bool bRet = false;
 
-        do 
+        switch(JAVAVM->GetEnv((void**)env, JNI_VERSION_1_4))
         {
-            if (JAVAVM->GetEnv((void**)env, JNI_VERSION_1_4) != JNI_OK)
-            {
-                LOGD("Failed to get the environment using GetEnv()");
-                break;
-            }
-
+        case JNI_OK:
+            bRet = true;
+            break;
+        case JNI_EDETACHED:
+            pthread_key_create (&s_threadKey, detach_current_thread);
             if (JAVAVM->AttachCurrentThread(env, 0) < 0)
             {
-                LOGD("Failed to get the environment using AttachCurrentThread()");
+                LOGD("%s", "Failed to get the environment using AttachCurrentThread()");
                 break;
             }
-
+            if (pthread_getspecific(s_threadKey) == NULL)
+                pthread_setspecific(s_threadKey, env); 
             bRet = true;
-        } while (0);        
+            break;
+        default:
+            LOGD("%s", "Failed to get the environment using GetEnv()");
+            break;
+        }      
 
         return bRet;
     }
@@ -99,8 +109,6 @@ extern "C"
         JNIEnv *pEnv = 0;
         bool bRet = false;
 
-//		LOGD("Try to find method %s", (std::string(className) + "::" + methodName).c_str());
-
         do 
         {
             if (! getEnv(&pEnv))
@@ -110,37 +118,19 @@ extern "C"
 
             jclass classID = getClassID_(className, pEnv);
 
-			if (0 == classID)
-				break;
+            methodID = pEnv->GetStaticMethodID(classID, methodName, paramCode);
+            if (! methodID)
+            {
+                LOGD("Failed to find static method id of %s", methodName);
+                break;
+            }
 
-//			LOGD("Class found %s", className);
+            methodinfo.classID = classID;
+            methodinfo.env = pEnv;
+            methodinfo.methodID = methodID;
 
-			methodID = pEnv->GetStaticMethodID(classID, methodName, paramCode);
-
-			if (JNI_TRUE == pEnv->ExceptionCheck())
-			{
-				LOGD("Exception occured while looking method %s", methodName);
-				jthrowable exceptionObj = pEnv->ExceptionOccurred();
-				pEnv->ExceptionClear();
-			}
-
-			if (! methodID)
-			{
-				LOGD("Failed to find static method id of %s", methodName);
-				break;
-			}
-
-			methodinfo.classID = classID;
-			methodinfo.env = pEnv;
-			methodinfo.methodID = methodID;
-
-			bRet = true;
+            bRet = true;
         } while (0);
-
-		if (true == bRet)
-		{
-//			LOGD("Method found %s", (std::string(className) + "::" + methodName).c_str());
-		}
 
         return bRet;
     }

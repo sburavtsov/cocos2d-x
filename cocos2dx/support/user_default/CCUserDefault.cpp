@@ -65,7 +65,7 @@ static tinyxml2::XMLElement* getXMLNodeForKey(const char* pKey, tinyxml2::XMLEle
 			CCLOG("can not read xml file");
 			break;
 		}
-		xmlDoc->Parse(pXmlBuffer);
+		xmlDoc->Parse(pXmlBuffer, nSize);
         delete[] pXmlBuffer;
 		// get root node
 		*rootNode = xmlDoc->RootElement();
@@ -149,6 +149,7 @@ bool CCUserDefault::m_sbIsFilePathInitialized = false;
  */
 CCUserDefault::~CCUserDefault()
 {
+	CC_SAFE_DELETE(m_spUserDefault);
     m_spUserDefault = NULL;
 }
 
@@ -159,7 +160,7 @@ CCUserDefault::CCUserDefault()
 
 void CCUserDefault::purgeSharedUserDefault()
 {
-    CC_SAFE_DELETE(m_spUserDefault);
+    m_spUserDefault = NULL;
 }
 
  bool CCUserDefault::getBoolForKey(const char* pKey)
@@ -411,7 +412,7 @@ bool CCUserDefault::createXMLFile()
     {  
         return false;  
     }  
-	tinyxml2::XMLDeclaration *pDeclaration = pDoc->NewDeclaration("1.0");  
+	tinyxml2::XMLDeclaration *pDeclaration = pDoc->NewDeclaration(NULL);  
 	if (NULL==pDeclaration)  
 	{  
 		return false;  

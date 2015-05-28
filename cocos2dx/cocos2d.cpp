@@ -30,27 +30,8 @@ NS_CC_BEGIN
 
 const char* cocos2dVersion()
 {
-    return "2.1.5";
+    return "cocos2d-x 2.2.6";
 }
-
-#ifdef CC_USE_ASSERTS
-
-static IAssertListener* s_pAssertListener = NULL;
-
-void CCAssertions::SetAssertListener(IAssertListener* pListener)
-{
-	s_pAssertListener = pListener;
-}
-
-void CCAssertions::AssertMessage(const char* szMessage, const char* szFile, int nLine)
-{
-	cocos2d::CCLog(ASSERT_MESSAGE_FORMAT, szFile, nLine, szMessage); 
-
-	if (NULL != s_pAssertListener)	
-		s_pAssertListener->OnAssert(szMessage, szFile, nLine); 
-}
-
-#endif
 
 NS_CC_END
 

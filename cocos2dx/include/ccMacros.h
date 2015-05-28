@@ -34,79 +34,20 @@ THE SOFTWARE.
 #include "platform/CCCommon.h"
 #include "CCStdC.h"
 
-#ifndef COCOS2D_FORCE_ASSERT
-#define COCOS2D_FORCE_ASSERT 1
-#endif
-
-#if COCOS2D_DEBUG > 0 || COCOS2D_FORCE_ASSERT > 0
-
-	#define CC_USE_ASSERTS
-
-NS_CC_BEGIN;
-
-	class CC_DLL IAssertListener
-	{
-	public:
-		virtual void OnAssert(const char* szMessage, const char* szFile, int nLine) = 0;
-	};
-
-	class CC_DLL CCAssertions
-	{
-	public:
-		static void SetAssertListener(IAssertListener* pListener);
-		static void AssertMessage(const char* szMessage, const char* szFile, int nLine);
-	};
-
-NS_CC_END;
-
-	extern bool CC_DLL cc_assert_script_compatible(const char *msg);
-
-	#define ASSERT_MESSAGE_FORMAT	"%s, assert failed at line %d: %s"
-
-	#define CC_ASSERT_MESSAGE(msg, filename, line) \
-	do { \
-		cocos2d::CCAssertions::AssertMessage(msg, filename, line); \
-		CC_SYSTEM_ASSERT(false); \
-	} while(0)
-
-	#define CC_ASSERT_WITH_MESSAGE(cond, msg, filename, line) \
-	do { \
-		if (false == (cond)) \
-			CC_ASSERT_MESSAGE(msg, filename, line); \
-	} while(0)
-
-	static inline bool __CheckAssertMessage(const char* szMessage)
-	{
-		return (NULL != szMessage && 0 != szMessage[0] && false == cc_assert_script_compatible(szMessage));
-	}
-
-	#define CC_ASSERT_WITH_MESSAGE_EX(cond, msg, filename, line) \
-	do {							\
-		if (false == (cond))	\
-		{ \
-			if (false == __CheckAssertMessage(msg)) \
-				CC_ASSERT_MESSAGE(#cond, filename, line); \
-			else \
-				CC_ASSERT_MESSAGE(msg, filename, line); \
-		} \
-	} while(0)
-	
-	#define CC_ASSERT(cond) CC_ASSERT_WITH_MESSAGE(cond, #cond, __FILE__, __LINE__)
-	#define CCAssert(cond, msg)	CC_ASSERT_WITH_MESSAGE_EX(cond, msg, __FILE__, __LINE__)
-
-	#define CCSetAssertListener(ptr) cocos2d::CCAssertions::SetAssertListener(ptr)
-
+#ifndef CCAssert
+#if COCOS2D_DEBUG > 0
+extern bool CC_DLL cc_assert_script_compatible(const char *msg);
+#define CCAssert(cond, msg) do {                              \
+      if (!(cond)) {                                          \
+        if (!cc_assert_script_compatible(msg) && strlen(msg)) \
+          cocos2d::CCLog("Assert failed: %s", msg);           \
+        CC_ASSERT(cond);                                      \
+      } \
+    } while (0)
 #else
-
-	#undef CC_USE_ASSERTS
-
-	#define	CC_ASSERT(cond)	CC_SYSTEM_ASSERT(cond)
-	#define	CCAssert(cond, msg)
-
-	#define CCSetAssertListener(ptr)
-
-#endif	// COCOS2D_DEBUG > 0
-
+#define CCAssert(cond, msg) ((void)(cond))
+#endif
+#endif  // CCAssert
 
 #include "ccConfig.h"
 

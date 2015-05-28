@@ -19,21 +19,11 @@ using namespace cocos2d;
 using namespace std;
 
 string g_apkPath;
-string g_extStoragePath;
-string g_deviceModel;
 
 extern "C" {
 
     JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxHelper_nativeSetApkPath(JNIEnv*  env, jobject thiz, jstring apkPath) {
         g_apkPath = JniHelper::jstring2string(apkPath);
-    }
-	
-	JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxHelper_nativeSetExtStoragePath(JNIEnv*  env, jobject thiz, jstring path) {
-        g_extStoragePath = JniHelper::jstring2string(path);
-    }
-	
-	JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxHelper_nativeSetDeviceModel(JNIEnv*  env, jobject thiz, jstring deviceModel) {
-		g_deviceModel = JniHelper::jstring2string(deviceModel);
     }
 
     JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxHelper_nativeSetEditTextDialogResult(JNIEnv * env, jobject obj, jbyteArray text) {
@@ -59,15 +49,6 @@ extern "C" {
 
 const char * getApkPath() {
     return g_apkPath.c_str();
-}
-
-const char * getExtStoragePath()
-{
-	return g_extStoragePath.c_str();
-}
-
-const char * getDeviceModel() {
-	return g_deviceModel.c_str();
 }
 
 void showDialogJNI(const char * pszMsg, const char * pszTitle) {

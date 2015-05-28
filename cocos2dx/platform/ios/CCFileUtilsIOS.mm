@@ -231,13 +231,6 @@ std::string CCFileUtilsIOS::getWritablePath()
     return strRet;
 }
 
-const std::string CCFileUtilsIOS::getApplicationDirectory()
-{
-	std::string strRet = [[[NSBundle mainBundle] bundlePath] UTF8String];
-	strRet.append("/");
-    return strRet;
-}
-
 bool CCFileUtilsIOS::isFileExist(const std::string& strFilePath)
 {
     if (0 == strFilePath.length())
@@ -314,30 +307,6 @@ CCDictionary* CCFileUtilsIOS::createCCDictionaryWithContentsOfFile(const std::st
     NSString* pPath = [NSString stringWithUTF8String:fullPath.c_str()];
     NSDictionary* pDict = [NSDictionary dictionaryWithContentsOfFile:pPath];
     
-    if (pDict != nil)
-    {
-        CCDictionary* pRet = new CCDictionary();
-        for (id key in [pDict allKeys]) {
-            id value = [pDict objectForKey:key];
-            addValueToCCDict(key, value, pRet);
-        }
-        
-        return pRet;
-    }
-    else
-    {
-        return NULL;
-    }
-}
-
-CCDictionary *CCFileUtilsIOS::createCCDictionaryWithData(const char *data, unsigned int size) {
-	
-	NSData *plistData = [[[NSData alloc] initWithBytes:data length:size] autorelease];
-	
-	NSDictionary * pDict = (NSDictionary *)[NSPropertyListSerialization propertyListFromData:plistData
-													 mutabilityOption:NSPropertyListImmutable
-															   format:NULL
-													 errorDescription:nil];
     if (pDict != nil)
     {
         CCDictionary* pRet = new CCDictionary();

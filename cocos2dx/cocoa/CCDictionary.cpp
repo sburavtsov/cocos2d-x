@@ -403,11 +403,6 @@ CCDictionary* CCDictionary::createWithDictionary(CCDictionary* srcDict)
     return pNewDict;
 }
 
-CCDictionary* CCDictionary::createWithData(const char *data, unsigned int size)
-{
-	return CCFileUtils::sharedFileUtils()->createCCDictionaryWithData(data, size);
-}
-
 CCDictionary* CCDictionary::createWithContentsOfFileThreadSafe(const char *pFileName)
 {
     return CCFileUtils::sharedFileUtils()->createCCDictionaryWithContentsOfFile(pFileName);

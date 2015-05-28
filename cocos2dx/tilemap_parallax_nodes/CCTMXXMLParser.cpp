@@ -112,25 +112,15 @@ CCTMXTilesetInfo::~CCTMXTilesetInfo()
 }
 CCRect CCTMXTilesetInfo::rectForGID(unsigned int gid)
 {
+    CCRect rect;
+    rect.size = m_tTileSize;
     gid &= kCCFlippedMask;
     gid = gid - m_uFirstGid;
-
     int max_x = (int)((m_tImageSize.width - m_uMargin*2 + m_uSpacing) / (m_tTileSize.width + m_uSpacing));
     //    int max_y = (imageSize.height - margin*2 + spacing) / (tileSize.height + spacing);
-
-	if (false == m_tImageSize.equals(CCSize(1, 1)))
-	{
-		if (0 != max_x)
-		{
-			CCRect rect;
-			rect.size = m_tTileSize;
-			rect.origin.x = (gid % max_x) * (m_tTileSize.width + m_uSpacing) + m_uMargin;
-			rect.origin.y = (gid / max_x) * (m_tTileSize.height + m_uSpacing) + m_uMargin;
-			return rect;
-		}
-	}
-
-	return CCRect(0, 0, 1, 1); // plist placeholder
+    rect.origin.x = (gid % max_x) * (m_tTileSize.width + m_uSpacing) + m_uMargin;
+    rect.origin.y = (gid / max_x) * (m_tTileSize.height + m_uSpacing) + m_uMargin;
+    return rect;
 }
 
 // implementation CCTMXMapInfo
@@ -213,7 +203,6 @@ CCTMXMapInfo::CCTMXMapInfo()
 , m_pProperties(NULL)
 , m_pTileProperties(NULL)
 , m_uCurrentFirstGID(0)
-, m_tileScale(1.f)
 {
 }
 
@@ -483,10 +472,8 @@ void CCTMXMapInfo::startElement(void *ctx, const char *name, const char **atts)
 
         if (m_sTMXFileName.find_last_of("/") != string::npos)
         {
-            //string dir = m_sTMXFileName.substr(0, m_sTMXFileName.find_last_of("/") + 1);
-            //tileset->m_sSourceImage = dir + imagename;
-
-			tileset->m_sSourceImage = imagename.substr( imagename.find_last_of("/") + 1 );
+            string dir = m_sTMXFileName.substr(0, m_sTMXFileName.find_last_of("/") + 1);
+            tileset->m_sSourceImage = dir + imagename;
         }
         else 
         {

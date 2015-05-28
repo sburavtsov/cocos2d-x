@@ -62,8 +62,6 @@ bool CCTMXLayer::initWithTilesetInfo(CCTMXTilesetInfo *tilesetInfo, CCTMXLayerIn
         texture = CCTextureCache::sharedTextureCache()->addImage(tilesetInfo->m_sSourceImage.c_str());
     }
 
-	CC_ASSERT(NULL != texture);
-
     if (CCSpriteBatchNode::initWithTexture(texture, (unsigned int)capacity))
     {
         // layerInfo
@@ -83,7 +81,6 @@ bool CCTMXLayer::initWithTilesetInfo(CCTMXTilesetInfo *tilesetInfo, CCTMXLayerIn
         // mapInfo
         m_tMapTileSize = mapInfo->getTileSize();
         m_uLayerOrientation = mapInfo->getOrientation();
-		setTileScale( mapInfo->getTileScale() );
 
         // offset (after layer orientation is set);
         CCPoint offset = this->calculateLayerOffset(layerInfo->m_tOffset);
@@ -110,8 +107,6 @@ CCTMXLayer::CCTMXLayer()
 ,m_sLayerName("")
 ,m_pReusedTile(NULL)
 ,m_pAtlasIndexArray(NULL)    
-,m_gidToTileNameDic(NULL)
-,m_tileScale(1.f)
 {}
 
 CCTMXLayer::~CCTMXLayer()
@@ -157,11 +152,8 @@ void CCTMXLayer::releaseMap()
 }
 
 // CCTMXLayer - setup Tiles
-void CCTMXLayer::setupTiles(CCDictionary * gidToTileNameDic)
+void CCTMXLayer::setupTiles()
 {    
-	if (NULL != gidToTileNameDic)
-		m_gidToTileNameDic = gidToTileNameDic;
-
     // Optimization: quick hack that sets the image size on the tileset
     m_pTileSet->m_tImageSize = m_pobTextureAtlas->getTexture()->getContentSizeInPixels();
 
@@ -196,8 +188,8 @@ void CCTMXLayer::setupTiles(CCDictionary * gidToTileNameDic)
                 this->appendTileForGID(gid, ccp(x, y));
 
                 // Optimization: update min and max GID rendered by the layer
-                m_uMinGID = MIN( (kCCFlippedMask & gid), m_uMinGID );
-                m_uMaxGID = MAX( (kCCFlippedMask & gid), m_uMaxGID );
+                m_uMinGID = MIN(gid, m_uMinGID);
+                m_uMaxGID = MAX(gid, m_uMaxGID);
             }
         }
     }
@@ -250,8 +242,6 @@ void CCTMXLayer::setupTileSprite(CCSprite* sprite, CCPoint pos, unsigned int gid
     sprite->setAnchorPoint(CCPointZero);
     sprite->setOpacity(m_cOpacity);
 
-	sprite->setScale( getTileScale() );
-
     //issue 1264, flip can be undone as well
     sprite->setFlipX(false);
     sprite->setFlipY(false);
@@ -302,30 +292,13 @@ void CCTMXLayer::setupTileSprite(CCSprite* sprite, CCPoint pos, unsigned int gid
     }
 }
 
-
-CCSprite* CCTMXLayer::reusedTileWithGID(unsigned int gid, CCRect rect)
-{
-	if (NULL != m_gidToTileNameDic)
-	{
-		unsigned int pureGID = kCCFlippedMask & gid;
-		CCString * tileName = (CCString *)m_gidToTileNameDic->objectForKey(pureGID);
-		CC_ASSERT(tileName != NULL);
-
-		CCSprite * sourceSprite = CCSprite::createWithSpriteFrameName(tileName->getCString());
-		return reusedTileWithRect(rect, sourceSprite);
-	}
-
-	return reusedTileWithRect(rect, NULL);
-}
-
-
-CCSprite* CCTMXLayer::reusedTileWithRect(CCRect rect, CCSprite * sourceSprite)
+CCSprite* CCTMXLayer::reusedTileWithRect(CCRect rect)
 {
     if (! m_pReusedTile) 
     {
         m_pReusedTile = new CCSprite();
         m_pReusedTile->initWithTexture(m_pobTextureAtlas->getTexture(), rect, false);
-        //m_pReusedTile->setBatchNode(this); // moved to the end of function
+        m_pReusedTile->setBatchNode(this);
     }
     else
     {
@@ -337,18 +310,9 @@ CCSprite* CCTMXLayer::reusedTileWithRect(CCRect rect, CCSprite * sourceSprite)
         m_pReusedTile->setTextureRect(rect, false, rect.size);
         
 		// restore the batch node
-        //m_pReusedTile->setBatchNode(this); // moved to the end of function
+        m_pReusedTile->setBatchNode(this);
     }
 
-	if ( NULL != sourceSprite)
-	{
-		CCTexture2D * atlasTexture = m_pobTextureAtlas->getTexture();
-		m_pReusedTile->initWithSpriteFrame(sourceSprite->displayFrame());
-
-		CC_ASSERT(sourceSprite->getTexture() == atlasTexture); // textures must be same
-	}
-
-	m_pReusedTile->setBatchNode(this);
     return m_pReusedTile;
 }
 
@@ -358,46 +322,36 @@ CCSprite * CCTMXLayer::tileAt(const CCPoint& pos)
     CCAssert(pos.x < m_tLayerSize.width && pos.y < m_tLayerSize.height && pos.x >=0 && pos.y >=0, "TMXLayer: invalid position");
     CCAssert(m_pTiles && m_pAtlasIndexArray, "TMXLayer: the tiles map has been released");
 
+    CCSprite *tile = NULL;
     unsigned int gid = this->tileGIDAt(pos);
 
     // if GID == 0, then no tile is present
-    if (0 == gid) 
-	{
-		return NULL;
-	}
+    if (gid) 
+    {
+        int z = (int)(pos.x + pos.y * m_tLayerSize.width);
+        tile = (CCSprite*) this->getChildByTag(z);
 
-	CCSprite * tile;
-	CCString * tileName;
+        // tile not created yet. create it
+        if (! tile) 
+        {
+            CCRect rect = m_pTileSet->rectForGID(gid);
+            rect = CC_RECT_PIXELS_TO_POINTS(rect);
 
-	if (NULL == m_gidToTileNameDic)
-	{  
-		CCRect rect = m_pTileSet->rectForGID(gid);
-		rect = CC_RECT_PIXELS_TO_POINTS(rect);
+            tile = new CCSprite();
+            tile->initWithTexture(this->getTexture(), rect);
+            tile->setBatchNode(this);
+            tile->setPosition(positionAt(pos));
+            tile->setVertexZ((float)vertexZForPos(pos));
+            tile->setAnchorPoint(CCPointZero);
+            tile->setOpacity(m_cOpacity);
 
-		tile = new CCSprite();
-		tile->initWithTexture(this->getTexture(), rect);
-		//tile->setBatchNode(this);
-	}
-	else
-	{
-		tileName = (CCString *)m_gidToTileNameDic->objectForKey(gid);
-		CC_ASSERT(tileName != NULL);
-
-		tile = CCSprite::createWithSpriteFrameName(tileName->getCString());
-	}
-
-	if (NULL == tile)
-	{
-		CCAssert(false, "Something's gone wrong");
-		return NULL;
-	}
-
-	tile->setPosition(positionAt(pos));
-	tile->setVertexZ((float)vertexZForPos(pos));
-	tile->setAnchorPoint(CCPointZero);
-	tile->setOpacity(m_cOpacity);
-
-	return tile;
+            unsigned int indexForZ = atlasIndexForExistantZ(z);
+            this->addSpriteWithoutQuad(tile, indexForZ, z);
+            tile->release();
+        }
+    }
+    
+    return tile;
 }
 
 unsigned int CCTMXLayer::tileGIDAt(const CCPoint& pos)
@@ -431,7 +385,7 @@ CCSprite * CCTMXLayer::insertTileForGID(unsigned int gid, const CCPoint& pos)
 
     intptr_t z = (intptr_t)(pos.x + pos.y * m_tLayerSize.width);
 
-    CCSprite *tile = reusedTileWithGID(gid, rect);
+    CCSprite *tile = reusedTileWithRect(rect);
 
     setupTileSprite(tile, pos, gid);
 
@@ -464,25 +418,19 @@ CCSprite * CCTMXLayer::insertTileForGID(unsigned int gid, const CCPoint& pos)
     m_pTiles[z] = gid;
     return tile;
 }
-CCSprite * CCTMXLayer::updateTileForGID(unsigned int gid, const CCPoint& pos, CCSprite * sourceSprite)
+CCSprite * CCTMXLayer::updateTileForGID(unsigned int gid, const CCPoint& pos)    
 {
     CCRect rect = m_pTileSet->rectForGID(gid);
     rect = CCRectMake(rect.origin.x / m_fContentScaleFactor, rect.origin.y / m_fContentScaleFactor, rect.size.width/ m_fContentScaleFactor, rect.size.height/ m_fContentScaleFactor);
     int z = (int)(pos.x + pos.y * m_tLayerSize.width);
 
-	// WW: source sprite could be from [updateTile] or from [plist] as well
-	GLubyte opacityValue = (NULL == sourceSprite)
-		? m_cOpacity
-		: sourceSprite->getOpacity(); // WW: hack for generators
+    CCSprite *tile = reusedTileWithRect(rect);
 
-    CCSprite * tile = reusedTileWithRect(rect, sourceSprite);
-	setupTileSprite(tile ,pos ,gid);
+    setupTileSprite(tile ,pos ,gid);
 
-	tile->setOpacity(opacityValue); // WW: hack for generators
-
-	unsigned int indexForZ = atlasIndexForExistantZ(z);
-	tile->setAtlasIndex(indexForZ);
-
+    // get atlas index
+    unsigned int indexForZ = atlasIndexForExistantZ(z);
+    tile->setAtlasIndex(indexForZ);
     tile->setDirty(true);
     tile->updateTransform();
     m_pTiles[z] = gid;
@@ -499,7 +447,8 @@ CCSprite * CCTMXLayer::appendTileForGID(unsigned int gid, const CCPoint& pos)
 
     intptr_t z = (intptr_t)(pos.x + pos.y * m_tLayerSize.width);
 
-    CCSprite * tile = reusedTileWithGID(gid, rect);
+    CCSprite *tile = reusedTileWithRect(rect);
+
     setupTileSprite(tile ,pos ,gid);
 
     // optimization:

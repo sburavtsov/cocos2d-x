@@ -127,14 +127,14 @@ void CCTMXTiledMap::setProperties(CCDictionary* var)
 }
 
 // private
-CCTMXLayer * CCTMXTiledMap::parseLayer(CCTMXLayerInfo *layerInfo, CCTMXMapInfo *mapInfo, CCDictionary * gidToTileNameDic)
+CCTMXLayer * CCTMXTiledMap::parseLayer(CCTMXLayerInfo *layerInfo, CCTMXMapInfo *mapInfo)
 {
     CCTMXTilesetInfo *tileset = tilesetForLayer(layerInfo, mapInfo);
     CCTMXLayer *layer = CCTMXLayer::create(tileset, layerInfo, mapInfo);
 
     // tell the layerinfo to release the ownership of the tiles map.
     layerInfo->m_bOwnTiles = false;
-    layer->setupTiles(gidToTileNameDic);
+    layer->setupTiles();
 
     return layer;
 }
@@ -165,30 +165,13 @@ CCTMXTilesetInfo * CCTMXTiledMap::tilesetForLayer(CCTMXLayerInfo *layerInfo, CCT
                         //    gid = CFSwapInt32( gid );
                         /* We support little endian.*/
 
-						// FIXME: to work fine layer MUST have at least on NOT nulled tile
                         // XXX: gid == 0 --> empty tile
-                        if (0 != gid) 
+                        if( gid != 0 ) 
                         {
-							unsigned int pureGID = (kCCFlippedMask & gid);
-
                             // Optimization: quick return
                             // if the layer is invalid (more than 1 tileset per layer) an CCAssert will be thrown later
-                            if (pureGID >= tileset->m_uFirstGid)
-							{
-								// FIXME: Layers from TMX file have nulled MaxGID at this point
-								if (0 == layerInfo->m_uMaxGID)
-								{
-									return tileset;
-								}
-								else
-								{
-									// Layer added in "runtime" have correct MaxGID
-									if (pureGID <= layerInfo->m_uMaxGID)
-									{
-										return tileset;
-									}
-								}
-							}
+                            if( (gid & kCCFlippedMask) >= tileset->m_uFirstGid )
+                                return tileset;
                         }
                     }
                 }        

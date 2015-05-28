@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #import "CCApplication.h"
-#import "cocos2d.h"
+
 #import <UIKit/UIKit.h>
 
 #import "CCGeometry.h"
@@ -57,21 +57,6 @@ int CCApplication::run()
 void CCApplication::setAnimationInterval(double interval)
 {
     [[CCDirectorCaller sharedDirectorCaller] setAnimationInterval: interval ];
-}
-
-std::string CCApplication::getCountryCode() {
-	
-	NSLocale *locale = [NSLocale currentLocale];
-	NSString *countryCode = [locale objectForKey: NSLocaleCountryCode];
-	return [countryCode UTF8String];
-}
-
-
-void CCApplication::openURL(const char* pszUrl)
-{
-	NSString *msg = [NSString stringWithCString:pszUrl encoding:NSASCIIStringEncoding];
-	NSURL *nsUrl = [NSURL URLWithString:msg];
-	[[UIApplication sharedApplication] openURL:nsUrl];
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,6 +100,9 @@ ccLanguageType CCApplication::getCurrentLanguage()
     }
     else if ([languageCode isEqualToString:@"es"]){
         ret = kLanguageSpanish;
+    }
+    else if ([languageCode isEqualToString:@"nl"]){
+        ret = kLanguageDutch;
     }
     else if ([languageCode isEqualToString:@"ru"]){
         ret = kLanguageRussian;

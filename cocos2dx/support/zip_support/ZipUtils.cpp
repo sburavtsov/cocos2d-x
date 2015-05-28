@@ -28,6 +28,7 @@
 #include "ZipUtils.h"
 #include "ccMacros.h"
 #include "platform/CCFileUtils.h"
+#include "unzip.h"
 #include <map>
 
 NS_CC_BEGIN
@@ -170,8 +171,7 @@ int ZipUtils::ccInflateMemoryWithHint(unsigned char *in, unsigned int inLength, 
         // not enough memory ?
         if (err != Z_STREAM_END)
         {
-            delete [] *out;
-            *out = new unsigned char[bufferSize * BUFFER_INC_FACTOR];
+            *out = (unsigned char*)realloc(*out, bufferSize * BUFFER_INC_FACTOR);
             
             /* not enough memory, ouch */
             if (! *out )
@@ -437,10 +437,15 @@ void ZipUtils::ccSetPvrEncryptionKey(unsigned int keyPart1, unsigned int keyPart
 // from unzip.cpp
 #define UNZ_MAXFILENAMEINZIP 256
 
+struct ZipEntryInfo
+{
+    unz_file_pos pos;
+    uLong uncompressed_size;
+};
+
 class ZipFilePrivate
 {
 public:
-	std::string fileName;
     unzFile zipFile;
     
     // std::unordered_map is faster if available on the platform
@@ -449,10 +454,12 @@ public:
 };
 
 ZipFile::ZipFile(const std::string &zipFile, const std::string &filter)
-: m_data(new ZipFilePrivate)
+: _data(new ZipFilePrivate)
+, _dataThread(new ZipFilePrivate)
 {
-    m_data->zipFile = unzOpen(zipFile.c_str());
-    if (m_data->zipFile)
+    _data->zipFile = unzOpen(zipFile.c_str());
+    _dataThread->zipFile = unzOpen(zipFile.c_str());
+    if (_data->zipFile && _dataThread->zipFile)
     {
         setFilter(filter);
     }
@@ -460,35 +467,40 @@ ZipFile::ZipFile(const std::string &zipFile, const std::string &filter)
 
 ZipFile::~ZipFile()
 {
-    if (m_data && m_data->zipFile)
+    if (_data && _data->zipFile)
     {
-        unzClose(m_data->zipFile);
+        unzClose(_data->zipFile);
     }
-    CC_SAFE_DELETE(m_data);
+    if (_dataThread && _dataThread->zipFile)
+    {
+        unzClose(_dataThread->zipFile);
+    }
+    CC_SAFE_DELETE(_data);
+    CC_SAFE_DELETE(_dataThread);
 }
 
-bool ZipFile::setFilter(const std::string &filter)
+bool ZipFile::setFilter(const std::string &filter, ZipFilePrivate *data)
 {
     bool ret = false;
     do
     {
-        CC_BREAK_IF(!m_data);
-        CC_BREAK_IF(!m_data->zipFile);
+        CC_BREAK_IF(!data);
+        CC_BREAK_IF(!data->zipFile);
         
         // clear existing file list
-        m_data->fileList.clear();
+        data->fileList.clear();
         
         // UNZ_MAXFILENAMEINZIP + 1 - it is done so in unzLocateFile
         char szCurrentFileName[UNZ_MAXFILENAMEINZIP + 1];
         unz_file_info64 fileInfo;
         
         // go through all files and store position information about the required files
-        int err = unzGoToFirstFile64(m_data->zipFile, &fileInfo,
+        int err = unzGoToFirstFile64(data->zipFile, &fileInfo,
                                      szCurrentFileName, sizeof(szCurrentFileName) - 1);
         while (err == UNZ_OK)
         {
             unz_file_pos posInfo;
-            int posErr = unzGetFilePos(m_data->zipFile, &posInfo);
+            int posErr = unzGetFilePos(data->zipFile, &posInfo);
             if (posErr == UNZ_OK)
             {
                 std::string currentFileName = szCurrentFileName;
@@ -499,11 +511,11 @@ bool ZipFile::setFilter(const std::string &filter)
                     ZipEntryInfo entry;
                     entry.pos = posInfo;
                     entry.uncompressed_size = (uLong)fileInfo.uncompressed_size;
-                    m_data->fileList[currentFileName] = entry;
+                    data->fileList[currentFileName] = entry;
                 }
             }
             // next file - also get the information about it
-            err = unzGoToNextFile64(m_data->zipFile, &fileInfo,
+            err = unzGoToNextFile64(data->zipFile, &fileInfo,
                                     szCurrentFileName, sizeof(szCurrentFileName) - 1);
         }
         ret = true;
@@ -513,63 +525,30 @@ bool ZipFile::setFilter(const std::string &filter)
     return ret;
 }
 
+bool ZipFile::setFilter(const std::string &filter)
+{
+    return (setFilter(filter, _data) && setFilter(filter, _dataThread));
+}
+
 bool ZipFile::fileExists(const std::string &fileName) const
 {
     bool ret = false;
     do
     {
-        CC_BREAK_IF(!m_data);
+        CC_BREAK_IF(!_data);
         
-        ret = m_data->fileList.find(fileName) != m_data->fileList.end();
+        ret = _data->fileList.find(fileName) != _data->fileList.end();
     } while(false);
     
     return ret;
 }
 
-bool ZipFile::getFileEntry(ZipEntryInfo * outEntry, const std::string &fileName)
+unsigned char *ZipFile::getFileData(const std::string &fileName, unsigned long *pSize)
 {
-	do
-	{
-		CC_BREAK_IF(!m_data->zipFile);
-		CC_BREAK_IF(fileName.empty());
-
-		ZipFilePrivate::FileListContainer::const_iterator it = m_data->fileList.find(fileName);
-		CC_BREAK_IF(it == m_data->fileList.end());
-
-		outEntry->pos = (it->second).pos;
-		outEntry->uncompressed_size = (it->second).uncompressed_size;
-		return true;
-	}
-	while (false);
-
-	return false;
+    return getFileData(fileName, pSize, _data);
 }
 
-bool ZipFile::getFileData(void * dest, unsigned long fileSize, ZipEntryInfo & entry)
-{
-	do
-	{
-		CC_BREAK_IF(!m_data->zipFile);
-		CC_BREAK_IF(entry.uncompressed_size != fileSize);
-
-		int nRet = unzGoToFilePos(m_data->zipFile, &entry.pos);
-		CC_BREAK_IF(UNZ_OK != nRet);
-
-		nRet = unzOpenCurrentFile(m_data->zipFile);
-		CC_BREAK_IF(UNZ_OK != nRet);
-
-		int CC_UNUSED nSize = unzReadCurrentFile(m_data->zipFile, dest, fileSize);
-		CCAssert(nSize == 0 || nSize == (int)entry.uncompressed_size, "the file size is wrong");
-
-		unzCloseCurrentFile(m_data->zipFile);
-		return true;
-	}
-	while (false);
-
-	return false;
-}
-
-unsigned char * ZipFile::getFileData(const std::string &fileName, unsigned long *pSize)
+unsigned char *ZipFile::getFileData(const std::string &fileName, unsigned long *pSize, ZipFilePrivate *data)
 {
     unsigned char * pBuffer = NULL;
     if (pSize)
@@ -579,35 +558,32 @@ unsigned char * ZipFile::getFileData(const std::string &fileName, unsigned long 
     
     do
     {
-        ZipEntryInfo fileInfo;
-		CC_BREAK_IF(false == getFileEntry(&fileInfo, fileName));
-              
+        CC_BREAK_IF(!data->zipFile);
+        CC_BREAK_IF(fileName.empty());
+        
+        ZipFilePrivate::FileListContainer::const_iterator it = data->fileList.find(fileName);
+        CC_BREAK_IF(it ==  data->fileList.end());
+        
+        ZipEntryInfo fileInfo = it->second;
+        
+        int nRet = unzGoToFilePos(data->zipFile, &fileInfo.pos);
+        CC_BREAK_IF(UNZ_OK != nRet);
+        
+        nRet = unzOpenCurrentFile(data->zipFile);
+        CC_BREAK_IF(UNZ_OK != nRet);
+        
         pBuffer = new unsigned char[fileInfo.uncompressed_size];
-
-		if (false == getFileData(pBuffer, fileInfo.uncompressed_size, fileInfo))
-		{
-			delete [] pBuffer;
-			return NULL;
-		}
+        int CC_UNUSED nSize = unzReadCurrentFile(data->zipFile, pBuffer, fileInfo.uncompressed_size);
+        CCAssert(nSize == 0 || nSize == (int)fileInfo.uncompressed_size, "the file size is wrong");
         
         if (pSize)
         {
             *pSize = fileInfo.uncompressed_size;
         }
-
+        unzCloseCurrentFile(data->zipFile);
     } while (0);
     
     return pBuffer;
-}
-
-void ZipFile::setFileName(const char * fileName)
-{
-	(m_data->fileName) = fileName;
-}
-
-const std::string & ZipFile::getFileName() const
-{
-	return (m_data->fileName);
 }
 
 NS_CC_END

@@ -26,19 +26,20 @@
 #include "HttpClient.h"
 // #include "platform/CCThread.h"
 
-#include <queue>
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) ||  (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+#include "CCPThreadWinRT.h"
+typedef void THREAD_VOID;
+#define THREAD_RETURN
+#else
 #include <pthread.h>
-#include <errno.h>
-
-#include "curl/curl.h"
-
-
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-
-#include "jni/JniHelper.h"
-
+typedef void* THREAD_VOID;
+#define THREAD_RETURN 0
 #endif
 
+#include <errno.h>
+#include <queue>
+
+#include "curl/curl.h"
 
 NS_CC_EXT_BEGIN
 
@@ -93,27 +94,16 @@ static size_t writeHeaderData(void *ptr, size_t size, size_t nmemb, void *stream
 }
 
 
-static int processGetTask(CCHttpRequest *request, write_callback callback, void *stream, int32_t *errorCode, write_callback headerCallback, void *headerStream);
-static int processPostTask(CCHttpRequest *request, write_callback callback, void *stream, int32_t *errorCode, write_callback headerCallback, void *headerStream);
-static int processPutTask(CCHttpRequest *request, write_callback callback, void *stream, int32_t *errorCode, write_callback headerCallback, void *headerStream);
-static int processDeleteTask(CCHttpRequest *request, write_callback callback, void *stream, int32_t *errorCode, write_callback headerCallback, void *headerStream);
+static int processGetTask(CCHttpRequest *request, write_callback callback, void *stream, long *errorCode, write_callback headerCallback, void *headerStream);
+static int processPostTask(CCHttpRequest *request, write_callback callback, void *stream, long *errorCode, write_callback headerCallback, void *headerStream);
+static int processPutTask(CCHttpRequest *request, write_callback callback, void *stream, long *errorCode, write_callback headerCallback, void *headerStream);
+static int processDeleteTask(CCHttpRequest *request, write_callback callback, void *stream, long *errorCode, write_callback headerCallback, void *headerStream);
 // int processDownloadTask(HttpRequest *task, write_callback callback, void *stream, int32_t *errorCode);
 
 
 // Worker thread
-static void* networkThread(void *data)
-{
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-
-	JavaVM * javaVM = JniHelper::getJavaVM();
-	JNIEnv * javaEnv = NULL;
-	
-	javaVM->GetEnv((void**)&javaEnv, JNI_VERSION_1_4);
-	javaVM->AttachCurrentThread(&javaEnv, 0);
-
-#endif
-
-
+static THREAD_VOID networkThread(THREAD_VOID)
+{    
     CCHttpRequest *request = NULL;
     
     while (true) 
@@ -151,7 +141,7 @@ static void* networkThread(void *data)
         request->release();
         // ok, refcount = 1 now, only HttpResponse hold it.
         
-        int32_t responseCode = -1;
+        long responseCode = -1;
         int retValue = 0;
 
         // Process the request -> get response packet
@@ -243,7 +233,8 @@ static void* networkThread(void *data)
 
     pthread_exit(NULL);
     
-    return 0;
+    return THREAD_RETURN;
+
 }
 
 //Configure curl's timeout property
@@ -266,12 +257,12 @@ static bool configureCURL(CURL *handle)
     if (code != CURLE_OK) {
         return false;
     }
-	code = curl_easy_setopt(handle, CURLOPT_NOSIGNAL, 1L);
-	if (code != CURLE_OK) {
-		return false;
-	}
     curl_easy_setopt(handle, CURLOPT_SSL_VERIFYPEER, 0L);
     curl_easy_setopt(handle, CURLOPT_SSL_VERIFYHOST, 0L);
+
+    // FIXED #3224: The subthread of CCHttpClient interrupts main thread if timeout comes.
+    // Document is here: http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTNOSIGNAL 
+    curl_easy_setopt(handle, CURLOPT_NOSIGNAL, 1L);
 
     return true;
 }
@@ -338,7 +329,7 @@ public:
     }
 
     /// @param responseCode Null not allowed
-    bool perform(int *responseCode)
+    bool perform(long *responseCode)
     {
         if (CURLE_OK != curl_easy_perform(m_curl))
             return false;
@@ -353,7 +344,7 @@ public:
 };
 
 //Process Get Request
-static int processGetTask(CCHttpRequest *request, write_callback callback, void *stream, int32_t *responseCode, write_callback headerCallback, void *headerStream)
+static int processGetTask(CCHttpRequest *request, write_callback callback, void *stream, long *responseCode, write_callback headerCallback, void *headerStream)
 {
     CURLRaii curl;
     bool ok = curl.init(request, callback, stream, headerCallback, headerStream)
@@ -363,7 +354,7 @@ static int processGetTask(CCHttpRequest *request, write_callback callback, void 
 }
 
 //Process POST Request
-static int processPostTask(CCHttpRequest *request, write_callback callback, void *stream, int32_t *responseCode, write_callback headerCallback, void *headerStream)
+static int processPostTask(CCHttpRequest *request, write_callback callback, void *stream, long *responseCode, write_callback headerCallback, void *headerStream)
 {
     CURLRaii curl;
     bool ok = curl.init(request, callback, stream, headerCallback, headerStream)
@@ -375,7 +366,7 @@ static int processPostTask(CCHttpRequest *request, write_callback callback, void
 }
 
 //Process PUT Request
-static int processPutTask(CCHttpRequest *request, write_callback callback, void *stream, int32_t *responseCode, write_callback headerCallback, void *headerStream)
+static int processPutTask(CCHttpRequest *request, write_callback callback, void *stream, long *responseCode, write_callback headerCallback, void *headerStream)
 {
     CURLRaii curl;
     bool ok = curl.init(request, callback, stream, headerCallback, headerStream)
@@ -387,7 +378,7 @@ static int processPutTask(CCHttpRequest *request, write_callback callback, void 
 }
 
 //Process DELETE Request
-static int processDeleteTask(CCHttpRequest *request, write_callback callback, void *stream, int32_t *responseCode, write_callback headerCallback, void *headerStream)
+static int processDeleteTask(CCHttpRequest *request, write_callback callback, void *stream, long *responseCode, write_callback headerCallback, void *headerStream)
 {
     CURLRaii curl;
     bool ok = curl.init(request, callback, stream, headerCallback, headerStream)
@@ -418,7 +409,9 @@ CCHttpClient::CCHttpClient()
 : _timeoutForConnect(30)
 , _timeoutForRead(60)
 {
-	CCLOG("CURL version: %s", curl_version());
+    CCDirector::sharedDirector()->getScheduler()->scheduleSelector(
+                    schedule_selector(CCHttpClient::dispatchResponseCallbacks), this, 0, false);
+    CCDirector::sharedDirector()->getScheduler()->pauseTarget(this);
 }
 
 CCHttpClient::~CCHttpClient()
@@ -452,13 +445,9 @@ bool CCHttpClient::lazyInitThreadSemphore()
         pthread_cond_init(&s_SleepCondition, NULL);
 
         need_quit = false;
-
         pthread_create(&s_networkThread, NULL, networkThread, NULL);
         pthread_detach(s_networkThread);
-		
-		CCDirector::sharedDirector()->getScheduler()->scheduleSelector(
-																	   schedule_selector(CCHttpClient::dispatchResponseCallbacks), this, 0, false);
-		CCDirector::sharedDirector()->getScheduler()->pauseTarget(this);
+        
     }
     
     return true;
@@ -528,5 +517,7 @@ void CCHttpClient::dispatchResponseCallbacks(float delta)
 }
 
 NS_CC_EXT_END
+
+
 
 

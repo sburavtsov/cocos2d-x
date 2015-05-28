@@ -515,13 +515,7 @@ bool CCTexture2D::initWithString(const char *text, ccFontDefinition *textDefinit
     
     #if CC_ENABLE_CACHE_TEXTURE_DATA
         // cache the texture data
-        VolatileTexture::addStringTexture(
-			this, text,
-			textDefinition->m_dimensions,
-			textDefinition->m_alignment,
-			textDefinition->m_vertAlignment,
-			textDefinition->m_fontName.c_str(),
-			textDefinition->m_fontSize);
+        VolatileTexture::addStringTexture(this, text, textDefinition->m_dimensions, textDefinition->m_alignment, textDefinition->m_vertAlignment, textDefinition->m_fontName.c_str(), textDefinition->m_fontSize);
     #endif
         
         bool bRet = false;
@@ -550,10 +544,10 @@ bool CCTexture2D::initWithString(const char *text, ccFontDefinition *textDefinit
         
         // handle shadow parameters
         bool  shadowEnabled =  false;
-        float shadowDX      = 0.0;
-        float shadowDY      = 0.0;
-        float shadowBlur    = 0.0;
-        float shadowOpacity = 0.0;
+        float shadowDX      = 0.0f;
+        float shadowDY      = 0.0f;
+        float shadowBlur    = 0.0f;
+        float shadowOpacity = 0.0f;
         
         if ( textDefinition->m_shadow.m_shadowEnabled )
         {
@@ -566,10 +560,10 @@ bool CCTexture2D::initWithString(const char *text, ccFontDefinition *textDefinit
         
         // handle stroke parameters
         bool strokeEnabled = false;
-        float strokeColorR = 0.0;
-        float strokeColorG = 0.0;
-        float strokeColorB = 0.0;
-        float strokeSize   = 0.0;
+        float strokeColorR = 0.0f;
+        float strokeColorG = 0.0f;
+        float strokeColorB = 0.0f;
+        float strokeSize   = 0.0f;
         
         if ( textDefinition->m_stroke.m_strokeEnabled )
         {

@@ -27,15 +27,12 @@ import org.cocos2dx.lib.Cocos2dxHelper.Cocos2dxHelperListener;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
-import android.view.View;
 import android.view.ViewGroup;
 import android.util.Log;
 import android.widget.FrameLayout;
-import android.net.Uri;
 
 public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelperListener {
 	// ===========================================================
@@ -48,13 +45,9 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	// Fields
 	// ===========================================================
 	
-	protected Cocos2dxGLSurfaceView mGLSurfaceView;
+	private Cocos2dxGLSurfaceView mGLSurfaceView;
 	private Cocos2dxHandler mHandler;
-	protected static Activity me = null;
 	private static Context sContext = null;
-	
-	private boolean haveFocus;
-	private boolean isResumed;
 	
 	public static Context getContext() {
 		return sContext;
@@ -65,14 +58,9 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	// ===========================================================
 	
 	@Override
-	protected void onCreate(final Bundle savedInstanceState)
-	{
-		haveFocus = false;
-		isResumed = false; 
-		
+	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		sContext = this;
-		me = this;
     	this.mHandler = new Cocos2dxHandler(this);
 
     	this.init();
@@ -89,76 +77,21 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	// ===========================================================
 
 	@Override
-	protected void onResume()
-	{
+	protected void onResume() {
 		super.onResume();
-		isResumed = true;
-		
+
 		Cocos2dxHelper.onResume();
-		TryResumeRenderer();
+		this.mGLSurfaceView.onResume();
 	}
 
 	@Override
-	protected void onPause()
-	{	
-		isResumed = false;
-		// http://gamedev.stackexchange.com/questions/12629/workaround-to-losing-the-opengl-context-when-android-pauses
-		// Basically the trick is to detach your GLSurfaceView from the view hierarchy
-		// from your Activity's onPause(). Since it's not in the view hierarchy
-		// at the point onPause() runs, the context never gets destroyed.
-
-		if (null != mGLSurfaceView)
-		{
-			mGLSurfaceView.onPause();
-			mGLSurfaceView.setVisibility(View.GONE);
-		}
-		
-		Cocos2dxHelper.onPause();
+	protected void onPause() {
 		super.onPause();
+
+		Cocos2dxHelper.onPause();
+		this.mGLSurfaceView.onPause();
 	}
-	
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus)
-	{
-		super.onWindowFocusChanged(hasFocus);
-		Log.e(TAG, "onWindowFocusChanged hasFocus=" + hasFocus);
-	
-		haveFocus = hasFocus;
-		
-		if (true == hasFocus)
-		{
-			TryResumeRenderer();
-		}
-	}
-	
-	
-	private void TryResumeRenderer()
-	{
-		if (null != mGLSurfaceView)
-		{
-			if (mGLSurfaceView.getVisibility() == View.GONE)
-			{
-				mGLSurfaceView.setVisibility(View.VISIBLE);
-			}
-		
-			// We need both callbacks OnResume + onWindowFocusChanged
-			if (haveFocus && isResumed)
-			{
-				mGLSurfaceView.onResume();
-				isResumed = false; // Do not resume surface until next Activity.OnResume callback
-			}
-		}
-	}
-	
-/*
-	/*@Override 
-	protected void onStop()
-	{
-		super.onStop();
-		
-	    //android.os.Process.killProcess(android.os.Process.myPid());
-	}*/
-	
+
 	@Override
 	public void showDialog(final String pTitle, final String pMessage) {
 		Message msg = new Message();
@@ -176,14 +109,10 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	}
 	
 	@Override
-	public void runOnGLThread(final Runnable pRunnable)
-	{
-		if (null != mGLSurfaceView)
-		{
-			mGLSurfaceView.queueEvent(pRunnable);
-		}
+	public void runOnGLThread(final Runnable pRunnable) {
+		this.mGLSurfaceView.queueEvent(pRunnable);
 	}
-
+	protected static FrameLayout mFrameLayout;
 	// ===========================================================
 	// Methods
 	// ===========================================================
@@ -193,8 +122,8 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         ViewGroup.LayoutParams framelayout_params =
             new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
                                        ViewGroup.LayoutParams.FILL_PARENT);
-        FrameLayout framelayout = new FrameLayout(this);
-        framelayout.setLayoutParams(framelayout_params);
+        mFrameLayout = new FrameLayout(this);
+        mFrameLayout.setLayoutParams(framelayout_params);
 
         // Cocos2dxEditText layout
         ViewGroup.LayoutParams edittext_layout_params =
@@ -204,15 +133,13 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         edittext.setLayoutParams(edittext_layout_params);
 
         // ...add to FrameLayout
-        framelayout.addView(edittext);
-        // WW add HDR icon here!
+        mFrameLayout.addView(edittext);
 
-        Log.e("Activity", "onCreateView()");
         // Cocos2dxGLSurfaceView
         this.mGLSurfaceView = this.onCreateView();
 
         // ...add to FrameLayout
-        framelayout.addView(this.mGLSurfaceView);
+        mFrameLayout.addView(this.mGLSurfaceView);
 
         // Switch to supported OpenGL (ARGB888) mode on emulator
         if (isAndroidEmulator())
@@ -222,11 +149,10 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         this.mGLSurfaceView.setCocos2dxEditText(edittext);
 
         // Set framelayout as the content view
-		setContentView(framelayout);
+		setContentView(mFrameLayout);
 	}
 	
     public Cocos2dxGLSurfaceView onCreateView() {
-    	Log.d(TAG, "new Cocos2dxGLSurfaceView!");
     	return new Cocos2dxGLSurfaceView(this);
     }
 

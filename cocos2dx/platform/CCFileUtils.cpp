@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "support/tinyxml2/tinyxml2.h"
 #include "support/zip_support/unzip.h"
 #include <stack>
+#include <algorithm>
 
 using namespace std;
 
@@ -100,21 +101,6 @@ public:
         parser.parse(pFileName);
         return m_pRootDict;
     }
-
-	CCDictionary* dictionaryWithData(const char * data, unsigned int size)
-	{
-		m_eResultType = SAX_RESULT_DICT;
-		CCSAXParser parser;
-
-		if (false == parser.init("UTF-8"))
-		{
-			return NULL;
-		}
-		parser.setDelegator(this);
-
-		parser.parse(data, size);
-		return m_pRootDict;
-	}
 
     CCArray* arrayWithContentsOfFile(const char* pFileName)
     {
@@ -335,12 +321,6 @@ CCDictionary* CCFileUtils::createCCDictionaryWithContentsOfFile(const std::strin
     return tMaker.dictionaryWithContentsOfFile(fullPath.c_str());
 }
 
-CCDictionary* CCFileUtils::createCCDictionaryWithData(const char * data, unsigned int size)
-{
-	CCDictMaker tMaker;
-	return tMaker.dictionaryWithData(data, size);
-}
-
 CCArray* CCFileUtils::createCCArrayWithContentsOfFile(const std::string& filename)
 {
     std::string fullPath = fullPathForFilename(filename.c_str());
@@ -470,10 +450,8 @@ NS_CC_BEGIN
 
 /* The subclass CCFileUtilsIOS and CCFileUtilsMac should override these two method. */
 CCDictionary* CCFileUtils::createCCDictionaryWithContentsOfFile(const std::string& filename) {return NULL;}
-CCDictionary* CCFileUtils::createCCDictionaryWithData(const char * data, unsigned int size) {return NULL;}
 bool CCFileUtils::writeToFile(cocos2d::CCDictionary *dict, const std::string &fullPath) {return NULL;}
 CCArray* CCFileUtils::createCCArrayWithContentsOfFile(const std::string& filename) {return NULL;}
-const std::string getApplicationDirectory() { return ""; }
 
 #endif /* (CC_TARGET_PLATFORM != CC_PLATFORM_IOS) && (CC_TARGET_PLATFORM != CC_PLATFORM_MAC) */
 
@@ -764,6 +742,27 @@ void CCFileUtils::addSearchPath(const char* path_)
     m_searchPathArray.push_back(path);
 }
 
+void CCFileUtils::removeSearchPath(const char *path_)
+{
+	std::string strPrefix;
+	std::string path(path_);
+	if (!isAbsolutePath(path))
+	{ // Not an absolute path
+		strPrefix = m_strDefaultResRootPath;
+	}
+	path = strPrefix + path;
+	if (path.length() > 0 && path[path.length()-1] != '/')
+	{
+		path += "/";
+	}
+	std::vector<std::string>::iterator iter = std::find(m_searchPathArray.begin(), m_searchPathArray.end(), path);
+	m_searchPathArray.erase(iter);
+}
+
+void CCFileUtils::removeAllPaths()
+{
+	m_searchPathArray.clear();
+}
 void CCFileUtils::setFilenameLookupDictionary(CCDictionary* pFilenameLookupDict)
 {
     m_fullPathCache.clear();

@@ -80,7 +80,7 @@ Basically, it's only enabled for Emscripten.
 
 It's new in cocos2d-x since v0.99.5
 */
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) || (CC_TARGET_PLATFORM == CC_PLATFORM_EMSCRIPTEN)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) || (CC_TARGET_PLATFORM == CC_PLATFORM_EMSCRIPTEN) || (CC_TARGET_PLATFORM == CC_PLATFORM_WP8)
     #define CC_ENABLE_CACHE_TEXTURE_DATA       1
 #else
     #define CC_ENABLE_CACHE_TEXTURE_DATA       0
@@ -208,19 +208,12 @@ public: virtual void set##funName(varType var)   \
 
 // cocos2d debug
 #if !defined(COCOS2D_DEBUG) || COCOS2D_DEBUG == 0
-
-#define CCLOG(format, ...)      cocos2d::CCLog(format, ##__VA_ARGS__)
-#define CCLOGERROR(format,...)  cocos2d::CCLog(format, ##__VA_ARGS__)
-#define CCLOGINFO(format,...)   do {} while (0)
-#define CCLOGWARN(...) __CCLOGWITHFUNCTION(__VA_ARGS__)
-/*
 #define CCLOG(...)       do {} while (0)
 #define CCLOGINFO(...)   do {} while (0)
 #define CCLOGERROR(...)  do {} while (0)
 #define CCLOGWARN(...)   do {} while (0)
-*/
-#elif COCOS2D_DEBUG == 1
 
+#elif COCOS2D_DEBUG == 1
 #define CCLOG(format, ...)      cocos2d::CCLog(format, ##__VA_ARGS__)
 #define CCLOGERROR(format,...)  cocos2d::CCLog(format, ##__VA_ARGS__)
 #define CCLOGINFO(format,...)   do {} while (0)

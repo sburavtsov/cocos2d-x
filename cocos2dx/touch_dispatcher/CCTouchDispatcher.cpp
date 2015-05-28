@@ -270,15 +270,6 @@ CCTouchHandler* CCTouchDispatcher::findHandler(CCTouchDelegate *pDelegate)
         }
     } 
 
-    CCARRAY_FOREACH(m_pHandlersToAdd, pObj)
-    {
-        CCTouchHandler* pHandler = (CCTouchHandler*)pObj;
-        if (pHandler->getDelegate() == pDelegate)
-        {
-            return pHandler;
-        }
-    }
-    
     return NULL;
 }
 

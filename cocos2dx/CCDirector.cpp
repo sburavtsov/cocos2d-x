@@ -64,7 +64,6 @@ THE SOFTWARE.
 #include "platform/CCImage.h"
 #include "CCEGLView.h"
 #include "CCConfiguration.h"
-#include "CCEventType.h" 
 
 
 
@@ -102,8 +101,6 @@ CCDirector* CCDirector::sharedDirector(void)
 }
 
 CCDirector::CCDirector(void)
-	: m_willEnterForegroundFlag(false)
-	, m_willEnterBackgroundFlag(false)
 {
 
 }
@@ -133,6 +130,7 @@ bool CCDirector::init(void)
     m_uTotalFrames = m_uFrames = 0;
     m_pszFPS = new char[10];
     m_pLastUpdate = new struct cc_timeval();
+    m_fSecondsPerFrame = 0.0f;
 
     // paused ?
     m_bPaused = false;
@@ -286,7 +284,7 @@ void CCDirector::drawScene(void)
     {
         showStats();
     }
-
+    
     kmGLPopMatrix();
 
     m_uTotalFrames++;
@@ -326,14 +324,13 @@ void CCDirector::calculateDeltaTime(void)
         m_fDeltaTime = MAX(0, m_fDeltaTime);
     }
 
-//#ifdef DEBUG
+#ifdef DEBUG
     // If we are debugging our code, prevent big delta time
-    if (m_fDeltaTime > 0.2f)
+    if(m_fDeltaTime > 0.2f)
     {
-		CCLog("BIG_DELTA_TIME OVERRIDE (was %f)", m_fDeltaTime);
         m_fDeltaTime = 1 / 60.0f;
     }
-//#endif
+#endif
 
     *m_pLastUpdate = now;
 }
@@ -353,7 +350,8 @@ void CCDirector::setOpenGLView(CCEGLView *pobOpenGLView)
 		conf->dumpInfo();
 
         // EAGLView is not a CCObject
-        delete m_pobOpenGLView; // [openGLView_ release]
+        if(m_pobOpenGLView)
+            delete m_pobOpenGLView; // [openGLView_ release]
         m_pobOpenGLView = pobOpenGLView;
 
         // set size
@@ -398,6 +396,9 @@ void CCDirector::setProjection(ccDirectorProjection kProjection)
         {
             kmGLMatrixMode(KM_GL_PROJECTION);
             kmGLLoadIdentity();
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WP8
+            kmGLMultMatrix(CCEGLView::sharedOpenGLView()->getOrientationMatrix());
+#endif
             kmMat4 orthoMatrix;
             kmMat4OrthographicProjection(&orthoMatrix, 0, size.width, 0, size.height, -1024, 1024 );
             kmGLMultMatrix(&orthoMatrix);
@@ -414,7 +415,11 @@ void CCDirector::setProjection(ccDirectorProjection kProjection)
 
             kmGLMatrixMode(KM_GL_PROJECTION);
             kmGLLoadIdentity();
-
+            
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WP8
+            //if needed, we need to add a rotation for Landscape orientations on Windows Phone 8 since it is always in Portrait Mode
+            kmGLMultMatrix(CCEGLView::sharedOpenGLView()->getOrientationMatrix());
+#endif
             // issue #1334
             kmMat4PerspectiveProjection( &matrixPerspective, 60, (GLfloat)size.width/size.height, 0.1f, zeye*2);
             // kmMat4PerspectiveProjection( &matrixPerspective, 60, (GLfloat)size.width/size.height, 0.1f, 1500);
@@ -453,7 +458,11 @@ void CCDirector::purgeCachedData(void)
     CCLabelBMFont::purgeCachedData();
     if (s_SharedDirector->getOpenGLView())
     {
+        CCSpriteFrameCache::sharedSpriteFrameCache()->purgeSharedSpriteFrameCache();
         CCTextureCache::sharedTextureCache()->removeUnusedTextures();
+#if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)
+        CCTextureCache::sharedTextureCache()->dumpCachedTextureInfo();
+#endif
     }
     CCFileUtils::sharedFileUtils()->purgeCachedEntries();
 }
@@ -477,6 +486,17 @@ void CCDirector::setAlphaBlending(bool bOn)
     CHECK_GL_ERROR_DEBUG();
 }
 
+void CCDirector::reshapeProjection(const CCSize& newWindowSize)
+{
+	CC_UNUSED_PARAM(newWindowSize);
+	if (m_pobOpenGLView)
+	{
+		m_obWinSizeInPoints = CCSizeMake(newWindowSize.width * m_fContentScaleFactor,
+			newWindowSize.height * m_fContentScaleFactor);
+		setProjection(m_eProjection);       
+	}
+
+}
 void CCDirector::setDepthTest(bool bOn)
 {
     if (bOn)
@@ -498,7 +518,12 @@ GLToClipTransform(kmMat4 *transformOut)
 {
 	kmMat4 projection;
 	kmGLGetMatrix(KM_GL_PROJECTION, &projection);
-	
+
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WP8
+    //if needed, we need to undo the rotation for Landscape orientation in order to get the correct positions
+	kmMat4Multiply(&projection, CCEGLView::sharedOpenGLView()->getReverseOrientationMatrix(), &projection);
+#endif
+
 	kmMat4 modelview;
 	kmGLGetMatrix(KM_GL_MODELVIEW, &modelview);
 	
@@ -623,28 +648,6 @@ void CCDirector::popScene(void)
         m_bSendCleanupToScene = true;
         m_pNextScene = (CCScene*)m_pobScenesStack->objectAtIndex(c - 1);
     }
-}
-
-CCScene * CCDirector::previousScene() {
-
-	unsigned int c = m_pobScenesStack->count();
-	if (1 >= c) return NULL;
-	return (CCScene*)m_pobScenesStack->objectAtIndex(c - 2);
-}
-
-void CCDirector::popScene(cocos2d::CCScene *transitionScene) {
-	
-	CCAssert(m_pRunningScene != NULL, "running scene should not null");
-	m_pobScenesStack->removeLastObject();
-	unsigned int c = m_pobScenesStack->count();
-	
-	if (c == 0) {
-		end();
-	}
-	else {
-		m_bSendCleanupToScene = true;
-		m_pNextScene = transitionScene;
-	}
 }
 
 void CCDirector::popToRootScene(void)
@@ -1080,7 +1083,6 @@ void CCDisplayLinkDirector::mainLoop(void)
          // release the objects
          CCPoolManager::sharedPoolManager()->pop();        
      }
-
 }
 
 void CCDisplayLinkDirector::stopAnimation(void)

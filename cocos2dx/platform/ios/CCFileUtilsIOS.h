@@ -49,13 +49,9 @@ public:
     virtual std::string getFullPathForDirectoryAndFilename(const std::string& strDirectory, const std::string& strFilename);
     
     virtual CCDictionary* createCCDictionaryWithContentsOfFile(const std::string& filename);
-	virtual CCDictionary* createCCDictionaryWithData(const char * data, unsigned int size);
-
     virtual bool writeToFile(CCDictionary *dict, const std::string& fullPath);
     
     virtual CCArray* createCCArrayWithContentsOfFile(const std::string& filename);
-	
-	virtual const std::string getApplicationDirectory();
 };
 
 // end of platform group

@@ -22,51 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ****************************************************************************/
 #include "platform/CCCommon.h"
-#include "platform/CCFileUtils.h"
-#include "CCDirector.h"
 #include "CCStdC.h"
 
 NS_CC_BEGIN
 
 #define MAX_LEN         (cocos2d::kMaxLogLen + 1)
-	
-void CCLogInt(const char * szText )
-{
-	char buffer[MAX_LEN];
-
-	SYSTEMTIME	time;
-
-	GetLocalTime( &time );
-		_snprintf( buffer, sizeof( buffer ), "%02d:%02d:%02d.%03d-%d\t%s", 
-			time.wHour,
-			time.wMinute,
-			time.wSecond,
-			time.wMilliseconds,
-			CCDirector::sharedDirector()->getTotalFrames(),
-			szText );
-
-	printf("%s\n", buffer);
-
-	WCHAR wszBuf[MAX_LEN] = {0};
-	MultiByteToWideChar(CP_UTF8, 0, buffer, -1, wszBuf, sizeof(wszBuf));
-	OutputDebugStringW(wszBuf);
-	OutputDebugStringA("\n");
-
-	// -----------------
-
-	static FILE * logFile = NULL;
-
-	if (NULL == logFile)
-	{
-		logFile = fopen((CCFileUtils::sharedFileUtils()->getWritablePath() + "log.txt").c_str(), "wt");
-	}
-
-	if (NULL != logFile)
-	{
-		fprintf(logFile, "%s\n", buffer);
-		fflush(logFile);
-	}
-}
 
 void CCLog(const char * pszFormat, ...)
 {
@@ -77,15 +37,18 @@ void CCLog(const char * pszFormat, ...)
     vsnprintf_s(szBuf, MAX_LEN, MAX_LEN, pszFormat, ap);
     va_end(ap);
 
-	CCLogInt( szBuf );
+    WCHAR wszBuf[MAX_LEN] = {0};
+    MultiByteToWideChar(CP_UTF8, 0, szBuf, -1, wszBuf, sizeof(wszBuf));
+    OutputDebugStringW(wszBuf);
+    OutputDebugStringA("\n");
+
+    WideCharToMultiByte(CP_ACP, 0, wszBuf, sizeof(wszBuf), szBuf, sizeof(szBuf), NULL, FALSE);
+    printf("%s\n", szBuf);
 }
 
 void CCMessageBox(const char * pszMsg, const char * pszTitle)
 {
-	if (IDOK != MessageBoxA(NULL, pszMsg, pszTitle, MB_OKCANCEL | MB_ICONHAND))
-	{
-		__asm { int 3 }
-	}
+    MessageBoxA(NULL, pszMsg, pszTitle, MB_OK);
 }
 
 void CCLuaLog(const char *pszMsg)

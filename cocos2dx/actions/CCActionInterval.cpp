@@ -102,12 +102,6 @@ bool CCActionInterval::initWithDuration(float d)
         m_fDuration = FLT_EPSILON;
     }
 
-	// WW: set minimal interval to negative durations (to call action ASAP)
-	if (m_fDuration < 0)
-	{
-		m_fDuration = FLT_EPSILON;
-	}
-
     m_elapsed = 0;
     m_bFirstTick = true;
 

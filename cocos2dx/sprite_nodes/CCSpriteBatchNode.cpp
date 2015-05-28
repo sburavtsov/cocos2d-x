@@ -670,6 +670,11 @@ void CCSpriteBatchNode::updateBlendFunc(void)
         m_blendFunc.src = GL_SRC_ALPHA;
         m_blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
     }
+    else
+    {
+        m_blendFunc.src = CC_BLEND_SRC;
+        m_blendFunc.dst = CC_BLEND_DST;
+    }
 }
 
 // CocosNodeTexture protocol
@@ -762,9 +767,8 @@ CCSpriteBatchNode * CCSpriteBatchNode::addSpriteWithoutQuad(CCSprite*child, unsi
     {
         CCSprite* pChild = (CCSprite*) pObject;
         if (pChild && (pChild->getAtlasIndex() >= z))
-        {
-            ++i;
-        }
+            break;
+        ++i;
     }
     
     m_pobDescendants->insertObject(child, i);

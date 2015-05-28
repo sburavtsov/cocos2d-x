@@ -1,10 +1,10 @@
 #ifndef __CC_APPLICATION_WIN32_H__
 #define __CC_APPLICATION_WIN32_H__
 
-#include <string>
 #include "CCStdC.h"
 #include "platform/CCCommon.h"
 #include "platform/CCApplicationProtocol.h"
+#include <string>
 
 NS_CC_BEGIN
 
@@ -19,7 +19,7 @@ public:
     /**
     @brief    Run the message loop.
     */
-    int run();
+    virtual int run();
 
     /**
     @brief    Get current applicaiton instance.
@@ -30,7 +30,6 @@ public:
     /* override functions */
     virtual void setAnimationInterval(double interval);
     virtual ccLanguageType getCurrentLanguage();
-	virtual std::string getCountryCode();
     
     /**
      @brief Get target platform
@@ -55,8 +54,6 @@ public:
     {
         return m_startupScriptFilename;
     }
-		
-		void openURL(const char* pszUrl);
 
 protected:
     HINSTANCE           m_hInstance;

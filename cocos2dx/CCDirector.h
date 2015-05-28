@@ -97,9 +97,20 @@ and when to execute the Scenes.
 class CC_DLL CCDirector : public CCObject, public TypeInfo
 {
 public:
+    /**
+     *  @js ctor
+     */
     CCDirector(void);
+    /**
+     *  @js NA
+     *  @lua NA
+     */
     virtual ~CCDirector(void);
     virtual bool init(void);
+    /**
+     * @js NA
+     * @lua NA
+     */
     virtual long getClassTypeInfo() {
 		static const long id = cocos2d::getHashCodeByString(typeid(cocos2d::CCDirector).name());
 		return id;
@@ -123,7 +134,9 @@ public:
     /** seconds per frame */
     inline float getSecondsPerFrame() { return m_fSecondsPerFrame; }
 
-    /** Get the CCEGLView, where everything is rendered */
+    /** Get the CCEGLView, where everything is rendered
+     * @js NA
+     */
     inline CCEGLView* getOpenGLView(void) { return m_pobOpenGLView; }
     void setOpenGLView(CCEGLView *pobOpenGLView);
 
@@ -133,15 +146,17 @@ public:
     /** Whether or not the Director is paused */
     inline bool isPaused(void) { return m_bPaused; }
 
-
     /** How many frames were called since the director started */
     inline unsigned int getTotalFrames(void) { return m_uTotalFrames; }
     
     /** Sets an OpenGL projection
      @since v0.8.2
+     @js NA
      */
     inline ccDirectorProjection getProjection(void) { return m_eProjection; }
     void setProjection(ccDirectorProjection kProjection);
+     /** reshape projection matrix when canvas has been change"*/
+    void reshapeProjection(const CCSize& newWindowSize);
     
     /** Sets the glViewport*/
     void setViewport();
@@ -227,10 +242,6 @@ public:
      */
     void popScene(void);
 
-	CCScene *previousScene(void);
-	
-	void popScene(CCScene *transitionScene);
-	
     /** Pops out all scenes from the queue until the root scene in the queue.
      * This scene will replace the running one.
      * Internally it will call `popToSceneStackLevel(1)`
@@ -337,6 +348,8 @@ public:
 
     /** CCAccelerometer associated with this director
      @since v2.0
+     @js NA
+     @lua NA
      */
     CC_PROPERTY(CCAccelerometer*, m_pAccelerometer, Accelerometer);
 
@@ -344,7 +357,9 @@ public:
 	CC_PROPERTY_READONLY(float, m_fDeltaTime, DeltaTime);
 	
 public:
-    /** returns a shared instance of the director */
+    /** returns a shared instance of the director 
+     *  @js getInstance
+     */
     static CCDirector* sharedDirector(void);
 
 protected:
@@ -381,13 +396,6 @@ protected:
     
     /** Whether or not the Director is paused */
     bool m_bPaused;
-
-	/**
-	Android OS may call applicationWillEnterForeground() NOT from main thread(!!!)
-	So we must rise this flag and call appWillEnterForeground in CCDirector::drawScene()
-	*/
-	volatile bool m_willEnterForegroundFlag;
-	volatile bool m_willEnterBackgroundFlag;
 
     /* How many frames were called since the director started */
     unsigned int m_uTotalFrames;
@@ -443,6 +451,8 @@ protected:
   - Only supports animation intervals of 1/60 1/30 & 1/15
  
  @since v0.8.2
+ @js NA
+ @lua NA
  */
 class CCDisplayLinkDirector : public CCDirector
 {

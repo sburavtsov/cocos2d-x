@@ -49,7 +49,6 @@ void CCApplication::setAnimationInterval(double interval)
     else
     {
         methodInfo.env->CallStaticVoidMethod(methodInfo.classID, methodInfo.methodID, interval);
-		methodInfo.env->DeleteLocalRef(methodInfo.classID);
     }
 }
 
@@ -62,14 +61,9 @@ CCApplication* CCApplication::sharedApplication()
     return sm_pSharedApplication;
 }
 
-std::string CCApplication::getCountryCode()
-{
-	return getCurrentLanguageJNI();
-}
-
 ccLanguageType CCApplication::getCurrentLanguage()
 {
-    std::string languageName = getCountryCode();
+    std::string languageName = getCurrentLanguageJNI();
     const char* pLanguageName = languageName.c_str();
     ccLanguageType ret = kLanguageEnglish;
 
@@ -97,6 +91,10 @@ ccLanguageType CCApplication::getCurrentLanguage()
     {
         ret = kLanguageSpanish;
     }
+    else if (0 == strcmp("nl", pLanguageName))
+    {
+        ret = kLanguageDutch;
+    }
     else if (0 == strcmp("ru", pLanguageName))
     {
         ret = kLanguageRussian;
@@ -123,22 +121,6 @@ ccLanguageType CCApplication::getCurrentLanguage()
     }
     
     return ret;
-}
-
-void CCApplication::openURL(const char* pszUrl)
-{
-	JniMethodInfo minfo;
-    
-    if(JniHelper::getStaticMethodInfo(minfo,
-		"com/almostart/lib/ArtHelpers",
-		"OpenURL",
-		"(Ljava/lang/String;)V"))
-    {
-        jstring StringArg1 = minfo.env->NewStringUTF(pszUrl);
-        minfo.env->CallStaticVoidMethod(minfo.classID, minfo.methodID, StringArg1);
-        minfo.env->DeleteLocalRef(StringArg1);
-        minfo.env->DeleteLocalRef(minfo.classID);
-    }
 }
 
 TargetPlatform CCApplication::getTargetPlatform()

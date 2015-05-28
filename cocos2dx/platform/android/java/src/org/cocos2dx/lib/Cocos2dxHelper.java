@@ -32,7 +32,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
 import android.os.Build;
-import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
@@ -70,12 +69,14 @@ public class Cocos2dxHelper {
 		Cocos2dxHelper.sPackageName = applicationInfo.packageName;
 		Cocos2dxHelper.sFileDirectory = pContext.getFilesDir().getAbsolutePath();
 		Cocos2dxHelper.nativeSetApkPath(applicationInfo.sourceDir);
-		Cocos2dxHelper.nativeSetExtStoragePath( Environment.getExternalStorageDirectory().getPath() );
-		Cocos2dxHelper.nativeSetDeviceModel(Build.MODEL);
 
 		Cocos2dxHelper.sCocos2dxAccelerometer = new Cocos2dxAccelerometer(pContext);
 		Cocos2dxHelper.sCocos2dMusic = new Cocos2dxMusic(pContext);
-		Cocos2dxHelper.sCocos2dSound = new Cocos2dxSound(pContext);
+		int simultaneousStreams = Cocos2dxSound.MAX_SIMULTANEOUS_STREAMS_DEFAULT;
+        if (Cocos2dxHelper.getDeviceModel().indexOf("GT-I9100") != -1) {
+            simultaneousStreams = Cocos2dxSound.MAX_SIMULTANEOUS_STREAMS_I9100;
+        }
+        Cocos2dxHelper.sCocos2dSound = new Cocos2dxSound(pContext, simultaneousStreams);
 		Cocos2dxHelper.sAssetManager = pContext.getAssets();
 		Cocos2dxBitmap.setContext(pContext);
 		Cocos2dxETCLoader.setContext(pContext);
@@ -94,8 +95,6 @@ public class Cocos2dxHelper {
 	// ===========================================================
 
 	private static native void nativeSetApkPath(final String pApkPath);
-	private static native void nativeSetExtStoragePath(final String path);
-	private static native void nativeSetDeviceModel(final String deviceModel);
 
 	private static native void nativeSetEditTextDialogResult(final byte[] pBytes);
 

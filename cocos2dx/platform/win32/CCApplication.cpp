@@ -3,7 +3,6 @@
 #include "CCDirector.h"
 #include <algorithm>
 #include "platform/CCFileUtils.h"
-#include "ccMacros.h"
 /**
 @brief    This function change the PVRFrame show/hide setting in register.
 @param  bEnable If true show the PVRFrame window, otherwise hide.
@@ -14,7 +13,6 @@ NS_CC_BEGIN
 
 // sharedApplication pointer
 CCApplication * CCApplication::sm_pSharedApplication = 0;
-
 
 CCApplication::CCApplication()
 : m_hInstance(NULL)
@@ -108,32 +106,6 @@ CCApplication* CCApplication::sharedApplication()
     return sm_pSharedApplication;
 }
 
-
-std::string CCApplication::getCountryCode()
-{
-	ccLanguageType currentLangType = getCurrentLanguage();
-	switch (currentLangType)
-	{
-		case kLanguageRussian:		return "ru";
-		case kLanguageChinese:		return "cn";
-		case kLanguageFrench:		return "fr";
-		case kLanguageItalian:		return "it";
-		case kLanguageGerman:		return "de";
-		case kLanguageSpanish:		return "es";
-		case kLanguageKorean:		return "kr"; // KR for South Korea, KP for North Korea
-		case kLanguageJapanese:		return "jp";
-		case kLanguageHungarian:	return "hu";
-		case kLanguagePortuguese:	return "pt";
-		//		case kLanguageArabic:		return "ar"; // AR for argentina!!!
-
-		//case kLanguageEnglish:
-	}
-
-	// english is default
-	return "en";
-}
-
-
 ccLanguageType CCApplication::getCurrentLanguage()
 {
     ccLanguageType ret = kLanguageEnglish;
@@ -160,6 +132,9 @@ ccLanguageType CCApplication::getCurrentLanguage()
             break;
         case LANG_SPANISH:
             ret = kLanguageSpanish;
+            break;
+        case LANG_DUTCH:
+            ret = kLanguageDutch;
             break;
         case LANG_RUSSIAN:
             ret = kLanguageRussian;
@@ -212,11 +187,6 @@ void CCApplication::setStartupScriptFilename(const std::string& startupScriptFil
 {
     m_startupScriptFilename = startupScriptFile;
     std::replace(m_startupScriptFilename.begin(), m_startupScriptFilename.end(), '\\', '/');
-}
-
-void CCApplication::openURL(const char* pszUrl)
-{
-		ShellExecuteA(NULL, "open", pszUrl, NULL, NULL, SW_SHOWNORMAL);
 }
 
 NS_CC_END
