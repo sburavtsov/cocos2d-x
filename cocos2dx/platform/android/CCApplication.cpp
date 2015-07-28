@@ -49,7 +49,6 @@ void CCApplication::setAnimationInterval(double interval)
     else
     {
         methodInfo.env->CallStaticVoidMethod(methodInfo.classID, methodInfo.methodID, interval);
-		methodInfo.env->DeleteLocalRef(methodInfo.classID);
     }
 }
 
@@ -69,7 +68,7 @@ std::string CCApplication::getCountryCode()
 
 ccLanguageType CCApplication::getCurrentLanguage()
 {
-    std::string languageName = getCountryCode();
+    std::string languageName = getCurrentLanguageJNI();
     const char* pLanguageName = languageName.c_str();
     ccLanguageType ret = kLanguageEnglish;
 
@@ -96,6 +95,10 @@ ccLanguageType CCApplication::getCurrentLanguage()
     else if (0 == strcmp("es", pLanguageName))
     {
         ret = kLanguageSpanish;
+    }
+    else if (0 == strcmp("nl", pLanguageName))
+    {
+        ret = kLanguageDutch;
     }
     else if (0 == strcmp("ru", pLanguageName))
     {

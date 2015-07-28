@@ -66,7 +66,7 @@ NS_CC_END;
 	#define CC_ASSERT_MESSAGE(msg, filename, line) \
 	do { \
 		cocos2d::CCAssertions::AssertMessage(msg, filename, line); \
-		CC_SYSTEM_ASSERT(false); \
+		CC_ASSERT(false); \
 	} while(0)
 
 	#define CC_ASSERT_WITH_MESSAGE(cond, msg, filename, line) \
@@ -91,7 +91,7 @@ NS_CC_END;
 		} \
 	} while(0)
 	
-	#define CC_ASSERT(cond) CC_ASSERT_WITH_MESSAGE(cond, #cond, __FILE__, __LINE__)
+//#define CC_ASSERT(cond) CC_ASSERT_WITH_MESSAGE(cond, #cond, __FILE__, __LINE__)
 	#define CCAssert(cond, msg)	CC_ASSERT_WITH_MESSAGE_EX(cond, msg, __FILE__, __LINE__)
 
 	#define CCSetAssertListener(ptr) cocos2d::CCAssertions::SetAssertListener(ptr)
@@ -100,7 +100,6 @@ NS_CC_END;
 
 	#undef CC_USE_ASSERTS
 
-	#define	CC_ASSERT(cond)	CC_SYSTEM_ASSERT(cond)
 	#define	CCAssert(cond, msg)
 
 	#define CCSetAssertListener(ptr)

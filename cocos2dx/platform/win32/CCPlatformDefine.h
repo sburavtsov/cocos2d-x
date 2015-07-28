@@ -14,9 +14,9 @@
 #include <assert.h>
 
 #if CC_DISABLE_ASSERT > 0
-#define CC_SYSTEM_ASSERT(cond)
+#define CC_ASSERT(cond)
 #else
-#define CC_SYSTEM_ASSERT(cond)    assert(cond)
+#define CC_ASSERT(cond)    assert(cond)
 #endif
 #define CC_UNUSED_PARAM(unusedparam) (void)unusedparam
 

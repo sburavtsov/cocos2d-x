@@ -295,6 +295,8 @@
 		37EEEBF9175DDF3A003C1193 /* CCComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 37EEEBF5175DDF3A003C1193 /* CCComponent.h */; };
 		37EEEBFA175DDF3A003C1193 /* CCComponentContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 37EEEBF6175DDF3A003C1193 /* CCComponentContainer.cpp */; };
 		37EEEBFB175DDF3A003C1193 /* CCComponentContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = 37EEEBF7175DDF3A003C1193 /* CCComponentContainer.h */; };
+		38B2751D1B31F05600A657B8 /* CCKeyboardDispatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 38B2751B1B31F05600A657B8 /* CCKeyboardDispatcher.cpp */; };
+		38B2751E1B31F05600A657B8 /* CCKeyboardDispatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = 38B2751C1B31F05600A657B8 /* CCKeyboardDispatcher.h */; };
 		4698CFA9174CBB700066A57B /* CCTextureETC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4698CFA7174CBB700066A57B /* CCTextureETC.cpp */; };
 		4698CFAA174CBB700066A57B /* CCTextureETC.h in Headers */ = {isa = PBXBuildFile; fileRef = 4698CFA8174CBB700066A57B /* CCTextureETC.h */; };
 		469A7DF316C24787006FFCB2 /* tinyxml2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 469A7DF116C24787006FFCB2 /* tinyxml2.cpp */; };
@@ -610,6 +612,8 @@
 		37EEEBF5175DDF3A003C1193 /* CCComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCComponent.h; sourceTree = "<group>"; };
 		37EEEBF6175DDF3A003C1193 /* CCComponentContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCComponentContainer.cpp; sourceTree = "<group>"; };
 		37EEEBF7175DDF3A003C1193 /* CCComponentContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCComponentContainer.h; sourceTree = "<group>"; };
+		38B2751B1B31F05600A657B8 /* CCKeyboardDispatcher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCKeyboardDispatcher.cpp; sourceTree = "<group>"; };
+		38B2751C1B31F05600A657B8 /* CCKeyboardDispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCKeyboardDispatcher.h; sourceTree = "<group>"; };
 		4698CFA7174CBB700066A57B /* CCTextureETC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCTextureETC.cpp; sourceTree = "<group>"; };
 		4698CFA8174CBB700066A57B /* CCTextureETC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCTextureETC.h; sourceTree = "<group>"; };
 		469A7DF116C24787006FFCB2 /* tinyxml2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxml2.cpp; sourceTree = "<group>"; };
@@ -676,6 +680,7 @@
 		1551A353158F2ADE00E66CFE /* cocos2dx */ = {
 			isa = PBXGroup;
 			children = (
+				38B2751A1B31F05600A657B8 /* keyboard_dispatcher */,
 				1551A354158F2ADE00E66CFE /* actions */,
 				1551A370158F2ADE00E66CFE /* base_nodes */,
 				1551A375158F2ADE00E66CFE /* CCCamera.cpp */,
@@ -1105,25 +1110,25 @@
 			isa = PBXGroup;
 			children = (
 				1551A5E8158F2ADE00E66CFE /* base64.cpp */,
-				154269DA15B5653000712A7F /* CCNotificationCenter.cpp */,
-				1551A5EA158F2ADE00E66CFE /* CCPointExtension.cpp */,
-				1551A5EC158F2ADE00E66CFE /* CCProfiling.cpp */,
-				1A2802AE16DF1C5B00189CBF /* ccUTF8.cpp */,
-				1551A5F0158F2ADE00E66CFE /* ccUtils.cpp */,
-				1551A5F2158F2ADE00E66CFE /* CCVertex.cpp */,
-				1551A5FC158F2ADE00E66CFE /* TransformUtils.cpp */,
 				1551A5E9158F2ADE00E66CFE /* base64.h */,
+				154269DA15B5653000712A7F /* CCNotificationCenter.cpp */,
 				154269DB15B5653000712A7F /* CCNotificationCenter.h */,
+				1551A5EA158F2ADE00E66CFE /* CCPointExtension.cpp */,
 				1551A5EB158F2ADE00E66CFE /* CCPointExtension.h */,
+				1551A5EC158F2ADE00E66CFE /* CCProfiling.cpp */,
 				1551A5ED158F2ADE00E66CFE /* CCProfiling.h */,
+				1A2802AE16DF1C5B00189CBF /* ccUTF8.cpp */,
 				1A2802AF16DF1C5B00189CBF /* ccUTF8.h */,
+				1551A5F0158F2ADE00E66CFE /* ccUtils.cpp */,
 				1551A5F1158F2ADE00E66CFE /* ccUtils.h */,
+				1551A5F2158F2ADE00E66CFE /* CCVertex.cpp */,
 				1551A5F3158F2ADE00E66CFE /* CCVertex.h */,
-				1551A5FD158F2ADE00E66CFE /* TransformUtils.h */,
 				37EEEBF3175DDF3A003C1193 /* component */,
 				1551A5F4158F2ADE00E66CFE /* data_support */,
 				1551A5F9158F2ADE00E66CFE /* image_support */,
 				469A7DF016C24787006FFCB2 /* tinyxml2 */,
+				1551A5FC158F2ADE00E66CFE /* TransformUtils.cpp */,
+				1551A5FD158F2ADE00E66CFE /* TransformUtils.h */,
 				46A393F116E5D01B00210B16 /* user_default */,
 				1551A5FE158F2ADE00E66CFE /* zip_support */,
 			);
@@ -1273,6 +1278,15 @@
 			path = component;
 			sourceTree = "<group>";
 		};
+		38B2751A1B31F05600A657B8 /* keyboard_dispatcher */ = {
+			isa = PBXGroup;
+			children = (
+				38B2751B1B31F05600A657B8 /* CCKeyboardDispatcher.cpp */,
+				38B2751C1B31F05600A657B8 /* CCKeyboardDispatcher.h */,
+			);
+			path = keyboard_dispatcher;
+			sourceTree = "<group>";
+		};
 		469A7DF016C24787006FFCB2 /* tinyxml2 */ = {
 			isa = PBXGroup;
 			children = (
@@ -1408,6 +1422,7 @@
 				1551A823158F2ADF00E66CFE /* ccShader_PositionTexture_vert.h in Headers */,
 				1551A824158F2ADF00E66CFE /* ccShader_PositionTextureA8Color_frag.h in Headers */,
 				1551A825158F2ADF00E66CFE /* ccShader_PositionTextureA8Color_vert.h in Headers */,
+				38B2751E1B31F05600A657B8 /* CCKeyboardDispatcher.h in Headers */,
 				1551A826158F2ADF00E66CFE /* ccShader_PositionTextureColor_frag.h in Headers */,
 				1551A827158F2ADF00E66CFE /* ccShader_PositionTextureColor_vert.h in Headers */,
 				1551A828158F2ADF00E66CFE /* ccShader_PositionTextureColorAlphaTest_frag.h in Headers */,
@@ -1621,6 +1636,7 @@
 				1551A83A158F2ADF00E66CFE /* base64.cpp in Sources */,
 				1551A83C158F2ADF00E66CFE /* CCPointExtension.cpp in Sources */,
 				1551A83E158F2ADF00E66CFE /* CCProfiling.cpp in Sources */,
+				38B2751D1B31F05600A657B8 /* CCKeyboardDispatcher.cpp in Sources */,
 				1551A842158F2ADF00E66CFE /* ccUtils.cpp in Sources */,
 				1551A844158F2ADF00E66CFE /* CCVertex.cpp in Sources */,
 				1551A846158F2ADF00E66CFE /* ccCArray.cpp in Sources */,
@@ -1724,6 +1740,7 @@
 		1551A34D158F2AB200E66CFE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				DSTROOT = /tmp/cocos2dx.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "cocos2dx-Prefix.pch";
@@ -1738,6 +1755,7 @@
 					"\"$(SRCROOT)/../kazmath/include\"",
 					"\"$(SDKROOT)/usr/include/libxml2\"",
 				);
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../platform/third_party/ios/libraries\"",
@@ -1751,6 +1769,7 @@
 		1551A34E158F2AB200E66CFE /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				DSTROOT = /tmp/cocos2dx.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "cocos2dx-Prefix.pch";
@@ -1764,6 +1783,7 @@
 					"\"$(SRCROOT)/../kazmath/include\"",
 					"\"$(SDKROOT)/usr/include/libxml2\"",
 				);
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../platform/third_party/ios/libraries\"",

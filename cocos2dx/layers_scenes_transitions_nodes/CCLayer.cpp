@@ -45,6 +45,7 @@ NS_CC_BEGIN
 CCLayer::CCLayer()
 : m_bTouchEnabled(false)
 , m_bAccelerometerEnabled(false)
+, m_bKeyboardEnabled(false)
 , m_bKeypadEnabled(false)
 , m_pScriptTouchHandlerEntry(NULL)
 , m_pScriptKeypadHandlerEntry(NULL)
@@ -271,6 +272,30 @@ void CCLayer::registerScriptAccelerateHandler(int nHandler)
 void CCLayer::unregisterScriptAccelerateHandler(void)
 {
     CC_SAFE_RELEASE_NULL(m_pScriptAccelerateHandlerEntry);
+}
+
+/// isKeyboardEnabled getter
+bool CCLayer::isKeyboardEnabled()
+{
+    return m_bKeyboardEnabled;
+}
+/// isKeyboardEnabled setter
+void CCLayer::setKeyboardEnabled(bool enabled)
+{
+    if (enabled != m_bKeyboardEnabled)
+    {
+        m_bKeyboardEnabled = enabled;
+        
+        CCDirector* pDirector = CCDirector::sharedDirector();
+        if (enabled)
+        {
+            pDirector->getKeyboardDispatcher()->setKeyboardDelegate(this);
+        }
+        else
+        {
+            pDirector->getKeyboardDispatcher()->setKeyboardDelegate(NULL);
+        }
+    }
 }
 
 /// isKeypadEnabled getter

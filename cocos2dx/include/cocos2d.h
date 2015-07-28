@@ -2,6 +2,7 @@
 Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2008-2010 Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
+Copyright (c) Microsoft Open Technologies, Inc.
 
 http://www.cocos2d-x.org
 
@@ -36,8 +37,8 @@ THE SOFTWARE.
 #endif
 
 // 0x00 HI ME LO
-// 00   02 01 00
-#define COCOS2D_VERSION 0x00020100
+// 00   02 02 05
+#define COCOS2D_VERSION 0x00020206
 
 //
 // all cocos2d include files
@@ -91,6 +92,8 @@ THE SOFTWARE.
 // include
 #include "CCEventType.h"
 #include "CCProtocols.h"
+#include "ccConfig.h"
+#include "ccMacros.h"
 #include "ccTypes.h"
 
 // kazmath
@@ -100,6 +103,9 @@ THE SOFTWARE.
 // keypad_dispatcher
 #include "keypad_dispatcher/CCKeypadDelegate.h"
 #include "keypad_dispatcher/CCKeypadDispatcher.h"
+
+// keyboard dispatcher
+#include "keyboard_dispatcher/CCKeyboardDispatcher.h"
 
 // label_nodes
 #include "label_nodes/CCLabelAtlas.h"
@@ -172,6 +178,24 @@ THE SOFTWARE.
 	#include "platform/win32/CCStdC.h"
 #endif // CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+	#include "platform/winrt/CCApplication.h"
+	#include "platform/winrt/CCEGLView.h"
+	#include "platform/winrt/CCGL.h"
+	#include "platform/winrt/CCStdC.h"
+	#include "platform/winrt/CCAccelerometer.h"
+	#include "platform/winrt/CCPrecompiledShaders.h"
+#endif // CC_TARGET_PLATFORM == CC_PLATFORM_WINRT
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8)
+	#include "platform/winrt/CCApplication.h"
+	#include "platform/wp8/CCEGLView.h"
+	#include "platform/winrt/CCGL.h"
+	#include "platform/winrt/CCStdC.h"
+	#include "platform/winrt/CCAccelerometer.h"
+	#include "platform/winrt/CCPrecompiledShaders.h"
+#endif // CC_TARGET_PLATFORM == CC_PLATFORM_WP8
+
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_MAC)
 	#include "platform/mac/CCAccelerometer.h"
 	#include "platform/mac/CCApplication.h"
@@ -179,6 +203,10 @@ THE SOFTWARE.
 	#include "platform/mac/CCGL.h"
 	#include "platform/mac/CCStdC.h"
 #endif // CC_TARGET_PLATFORM == CC_PLATFORM_MAC
+
+
+
+
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
 	#include "platform/linux/CCAccelerometer.h"

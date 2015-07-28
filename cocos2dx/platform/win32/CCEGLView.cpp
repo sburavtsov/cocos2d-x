@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "touch_dispatcher/CCTouchDispatcher.h"
 #include "text_input_node/CCIMEDispatcher.h"
 #include "keypad_dispatcher/CCKeypadDispatcher.h"
+#include "keyboard_dispatcher/CCKeyboardDispatcher.h"
 #include "support/CCPointExtension.h"
 #include "CCApplication.h"
 
@@ -163,7 +164,7 @@ static bool glew_dynamic_binding()
 //////////////////////////////////////////////////////////////////////////
 static CCEGLView* s_pMainWindow = NULL;
 static const WCHAR* kWindowClassName = L"Cocos2dxWin32";
-
+CCEGLView* CCEGLView::s_pEglView = NULL;
 static LRESULT CALLBACK _WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (s_pMainWindow && s_pMainWindow->getHWnd() == hWnd)
@@ -448,29 +449,38 @@ LRESULT CCEGLView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
             break;
         }
         break;
-    case WM_KEYDOWN:
-        if (wParam == VK_F1 || wParam == VK_F2)
-        {
-            CCDirector* pDirector = CCDirector::sharedDirector();
-            if (GetKeyState(VK_LSHIFT) < 0 ||  GetKeyState(VK_RSHIFT) < 0 || GetKeyState(VK_SHIFT) < 0)
-                pDirector->getKeypadDispatcher()->dispatchKeypadMSG(wParam == VK_F1 ? kTypeBackClicked : kTypeMenuClicked);
-        }
-        else if (wParam == VK_ESCAPE)
-        {
-            CCDirector::sharedDirector()->getKeypadDispatcher()->dispatchKeypadMSG(kTypeBackClicked);
-        }
+	case WM_KEYDOWN: {
 
-        if ( m_lpfnAccelerometerKeyHook!=NULL )
-        {
-            (*m_lpfnAccelerometerKeyHook)( message,wParam,lParam );
-        }
-        break;
-    case WM_KEYUP:
-        if ( m_lpfnAccelerometerKeyHook!=NULL )
-        {
-            (*m_lpfnAccelerometerKeyHook)( message,wParam,lParam );
-        }
-        break;
+						 cocos2d::CCKeyboardDispatcher *kbDisp = cocos2d::CCDirector::sharedDirector()->getKeyboardDispatcher();
+						 kbDisp->dispatchKeyboardEvent(wParam, true);
+
+						 if (wParam == VK_F1 || wParam == VK_F2)
+						 {
+							 CCDirector* pDirector = CCDirector::sharedDirector();
+							 if (GetKeyState(VK_LSHIFT) < 0 || GetKeyState(VK_RSHIFT) < 0 || GetKeyState(VK_SHIFT) < 0)
+								 pDirector->getKeypadDispatcher()->dispatchKeypadMSG(wParam == VK_F1 ? kTypeBackClicked : kTypeMenuClicked);
+						 }
+						 else if (wParam == VK_ESCAPE)
+						 {
+							 CCDirector::sharedDirector()->getKeypadDispatcher()->dispatchKeypadMSG(kTypeBackClicked);
+						 }
+
+						 if (m_lpfnAccelerometerKeyHook != NULL)
+						 {
+							 (*m_lpfnAccelerometerKeyHook)(message, wParam, lParam);
+						 }
+	} break;
+	case WM_KEYUP: {
+
+					   cocos2d::CCKeyboardDispatcher *kbDisp = cocos2d::CCDirector::sharedDirector()->getKeyboardDispatcher();
+					   kbDisp->dispatchKeyboardEvent(wParam, false);
+
+					   if (m_lpfnAccelerometerKeyHook != NULL)
+					   {
+						   (*m_lpfnAccelerometerKeyHook)(message, wParam, lParam);
+					   }
+					   break;
+	}
     case WM_CHAR:
         {
             if (wParam < 0x20)
@@ -605,6 +615,11 @@ HWND CCEGLView::getHWnd()
     return m_hWnd;
 }
 
+void CCEGLView::setHWnd(HWND hWnd)
+{
+	m_hWnd = hWnd;
+}
+
 void CCEGLView::resize(int width, int height)
 {
     if (! m_hWnd)
@@ -669,6 +684,24 @@ void CCEGLView::setFrameSize(float width, float height)
     centerWindow();
 }
 
+void CCEGLView::setEditorFrameSize(float width, float height,HWND hWnd)
+{
+	m_hWnd=hWnd;
+
+	bool bRet = false;
+	do 
+	{	
+		resize(width, height);
+
+		bRet = initGL();
+		CC_BREAK_IF(!bRet);
+
+		s_pMainWindow = this;
+		bRet = true;
+	} while (0);
+
+	CCEGLViewProtocol::setFrameSize(width, height);
+}
 void CCEGLView::centerWindow()
 {
     if (! m_hWnd)

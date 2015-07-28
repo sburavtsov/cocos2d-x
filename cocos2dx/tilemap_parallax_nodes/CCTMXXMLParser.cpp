@@ -112,9 +112,10 @@ CCTMXTilesetInfo::~CCTMXTilesetInfo()
 }
 CCRect CCTMXTilesetInfo::rectForGID(unsigned int gid)
 {
+    CCRect rect;
+    rect.size = m_tTileSize;
     gid &= kCCFlippedMask;
     gid = gid - m_uFirstGid;
-
     int max_x = (int)((m_tImageSize.width - m_uMargin*2 + m_uSpacing) / (m_tTileSize.width + m_uSpacing));
     //    int max_y = (imageSize.height - margin*2 + spacing) / (tileSize.height + spacing);
 

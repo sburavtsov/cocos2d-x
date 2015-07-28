@@ -26,9 +26,18 @@
 #include "HttpClient.h"
 // #include "platform/CCThread.h"
 
-#include <queue>
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) ||  (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+#include "CCPThreadWinRT.h"
+typedef void THREAD_VOID;
+#define THREAD_RETURN
+#else
 #include <pthread.h>
+typedef void* THREAD_VOID;
+#define THREAD_RETURN 0
+#endif
+
 #include <errno.h>
+#include <queue>
 
 #include "curl/curl.h"
 
@@ -266,12 +275,12 @@ static bool configureCURL(CURL *handle)
     if (code != CURLE_OK) {
         return false;
     }
-	code = curl_easy_setopt(handle, CURLOPT_NOSIGNAL, 1L);
-	if (code != CURLE_OK) {
-		return false;
-	}
     curl_easy_setopt(handle, CURLOPT_SSL_VERIFYPEER, 0L);
     curl_easy_setopt(handle, CURLOPT_SSL_VERIFYHOST, 0L);
+
+    // FIXED #3224: The subthread of CCHttpClient interrupts main thread if timeout comes.
+    // Document is here: http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTNOSIGNAL 
+    curl_easy_setopt(handle, CURLOPT_NOSIGNAL, 1L);
 
     return true;
 }
@@ -418,7 +427,9 @@ CCHttpClient::CCHttpClient()
 : _timeoutForConnect(30)
 , _timeoutForRead(60)
 {
-	CCLOG("CURL version: %s", curl_version());
+    CCDirector::sharedDirector()->getScheduler()->scheduleSelector(
+                    schedule_selector(CCHttpClient::dispatchResponseCallbacks), this, 0, false);
+    CCDirector::sharedDirector()->getScheduler()->pauseTarget(this);
 }
 
 CCHttpClient::~CCHttpClient()
@@ -452,13 +463,9 @@ bool CCHttpClient::lazyInitThreadSemphore()
         pthread_cond_init(&s_SleepCondition, NULL);
 
         need_quit = false;
-
         pthread_create(&s_networkThread, NULL, networkThread, NULL);
         pthread_detach(s_networkThread);
-		
-		CCDirector::sharedDirector()->getScheduler()->scheduleSelector(
-																	   schedule_selector(CCHttpClient::dispatchResponseCallbacks), this, 0, false);
-		CCDirector::sharedDirector()->getScheduler()->pauseTarget(this);
+        
     }
     
     return true;
@@ -528,5 +535,7 @@ void CCHttpClient::dispatchResponseCallbacks(float delta)
 }
 
 NS_CC_EXT_END
+
+
 
 

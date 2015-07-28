@@ -745,6 +745,62 @@ void CCBAnimationManager::runAnimations(int nSeqId, float fTweenDuraiton)
     runAnimationsForSequenceIdTweenDuration(nSeqId, fTweenDuraiton);
 }
 
+void CCBAnimationManager::stopAnimationsForSequenceNamed(const char *pName) {
+    
+    int nSeqId = getSequenceId(pName);
+
+    mRootNode->stopAllActions();
+    
+    CCDictElement* pElement = NULL;
+    CCDICT_FOREACH(mNodeSequences, pElement)
+    {
+        CCNode *node = (CCNode*)pElement->getIntKey();
+        node->stopAllActions();
+        
+        // Refer to CCBReader::readKeyframe() for the real type of value
+        CCDictionary *seqs = (CCDictionary*)pElement->getObject();
+        CCDictionary *seqNodeProps = (CCDictionary*)seqs->objectForKey(nSeqId);
+        
+        set<string> seqNodePropNames;
+        
+        if (seqNodeProps)
+        {
+            // Reset nodes that have sequence node properties, and run actions on them
+            CCDictElement* pElement1 = NULL;
+            CCDICT_FOREACH(seqNodeProps, pElement1)
+            {
+                const char *propName = pElement1->getStrKey();
+                CCBSequenceProperty *seqProp = (CCBSequenceProperty*)seqNodeProps->objectForKey(propName);
+                seqNodePropNames.insert(propName);
+                
+                setFirstFrame(node, seqProp, 0.0f);
+                runAction(node, seqProp, 0.0f);
+            }
+        }
+        
+        // Reset the nodes that may have been changed by other timelines
+        CCDictionary *nodeBaseValues = (CCDictionary*)mBaseValues->objectForKey(pElement->getIntKey());
+        if (nodeBaseValues)
+        {
+            CCDictElement* pElement2 = NULL;
+            CCDICT_FOREACH(nodeBaseValues, pElement2)
+            {
+                if (seqNodePropNames.find(pElement2->getStrKey()) == seqNodePropNames.end())
+                {
+                    CCObject *value = pElement2->getObject();
+                    
+                    if (value)
+                    {
+                        setAnimatedProperty(pElement2->getStrKey(), node, value, 0.0f);
+                    }
+                }
+            }
+        }
+    }
+    
+    mRunningSequence = NULL;
+}
+
 void CCBAnimationManager::runAnimationsForSequenceIdTweenDuration(int nSeqId, float fTweenDuration)
 {
     CCAssert(nSeqId != -1, "Sequence id couldn't be found");

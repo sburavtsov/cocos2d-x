@@ -51,6 +51,13 @@ public:
     {
     }
 
+    ~BitmapDC(void)
+    {
+        if (m_pData)
+        {
+            delete [] m_pData;
+        }
+    }
 
     bool getBitmapFromJavaShadowStroke(	const char *text,
     									int nWidth,
@@ -238,7 +245,7 @@ void swapAlphaChannel(unsigned int *pImageMemory, unsigned int numPixels)
 		// copy the current pixel
 		unsigned int currenPixel =  (*pImageMemory);
 		// swap channels and store back
-		char *pSource = (char *) 	&currenPixel;
+		unsigned char *pSource = (unsigned char *) 	&currenPixel;
 		*pImageMemory = (pSource[0] << 24) | (pSource[3]<<16) | (pSource[2]<<8) | pSource[1];
 	}
 }

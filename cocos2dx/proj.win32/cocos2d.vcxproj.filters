@@ -103,6 +103,9 @@
     <Filter Include="support\component">
       <UniqueIdentifier>{485f1c18-d463-48d0-bcaa-a10e32aa3332}</UniqueIdentifier>
     </Filter>
+    <Filter Include="keyboard_dispatcher">
+      <UniqueIdentifier>{0a5473a5-e704-423a-9d37-63f873d77c78}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\base_nodes\CCAtlasNode.cpp">
@@ -473,6 +476,10 @@
     </ClCompile>
     <ClCompile Include="..\support\component\CCComponentContainer.cpp">
       <Filter>support\component</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="..\keyboard_dispatcher\CCKeyboardDispatcher.cpp">
+      <Filter>keyboard_dispatcher</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -951,6 +958,10 @@
     </ClInclude>
     <ClInclude Include="..\support\component\CCComponentContainer.h">
       <Filter>support\component</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="..\keyboard_dispatcher\CCKeyboardDispatcher.h">
+      <Filter>keyboard_dispatcher</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
