@@ -27,14 +27,14 @@ THE SOFTWARE.
 
 #ifndef __COCOS2D_H__
 #define __COCOS2D_H__
-
+/*
 #ifdef _WINDOWS
 	#define _CRTDBG_MAP_ALLOC
 	#include <stdlib.h>
 	#include <crtdbg.h>
 	#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
 	#define new DBG_NEW
-#endif
+#endif*/
 
 // 0x00 HI ME LO
 // 00   02 02 05

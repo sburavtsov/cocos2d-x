@@ -1,13 +1,13 @@
 #ifndef __COCOS2D_EXT_H__
 #define __COCOS2D_EXT_H__
 
-#ifdef _WINDOWS
+/*#ifdef _WINDOWS
 	#define _CRTDBG_MAP_ALLOC
 	#include <stdlib.h>
 	#include <crtdbg.h>
 	#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
 	#define new DBG_NEW
-#endif
+#endif*/
 
 #include "ExtensionMacros.h"
 

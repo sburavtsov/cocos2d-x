@@ -56,6 +56,7 @@ kazmath/src/vec3.c \
 kazmath/src/vec4.c \
 kazmath/src/GL/mat4stack.c \
 kazmath/src/GL/matrix.c \
+keyboard_dispatcher/CCKeyboardDispatcher.cpp \
 keypad_dispatcher/CCKeypadDelegate.cpp \
 keypad_dispatcher/CCKeypadDispatcher.cpp \
 label_nodes/CCLabelAtlas.cpp \

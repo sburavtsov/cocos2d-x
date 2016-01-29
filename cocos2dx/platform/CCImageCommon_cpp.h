@@ -151,12 +151,12 @@ bool CCImage::initWithImageFileThreadSafe(const char *fullpath, EImageFormat ima
 {
     bool bRet = false;
     unsigned long nSize = 0;
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-    CCFileUtilsAndroid *fileUitls = (CCFileUtilsAndroid*)CCFileUtils::sharedFileUtils();
-    unsigned char *pBuffer = fileUitls->getFileDataForAsync(fullpath, "rb", &nSize);
-#else
+// #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+//     CCFileUtilsAndroid *fileUitls = (CCFileUtilsAndroid*)CCFileUtils::sharedFileUtils();
+//     unsigned char *pBuffer = fileUitls->getFileDataForAsync(fullpath, "rb", &nSize);
+// #else
     unsigned char *pBuffer = CCFileUtils::sharedFileUtils()->getFileData(fullpath, "rb", &nSize);
-#endif
+//#endif
     if (pBuffer != NULL && nSize > 0)
     {
         bRet = initWithImageData(pBuffer, nSize, imageType);
